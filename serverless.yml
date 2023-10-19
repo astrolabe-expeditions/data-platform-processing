@@ -1,0 +1,26 @@
+service: ae-data-platform
+
+provider:
+  name: scaleway
+
+  # Runtime used for functions (unless overridden)
+  # List: https://www.scaleway.com/en/docs/serverless/functions/reference-content/functions-lifecycle/#available-runtimes
+  runtime: python310
+
+  # Scaleway region for the deploy
+  scwRegion: fr-par
+
+# Include/exclude directories
+package:
+  patterns:
+    - "!node_modules/**"
+    - "!.gitignore"
+    - "!.git/**"
+
+functions:
+  demo:
+    handler: src/demo.run
+
+plugins:
+  - serverless-scaleway-functions
+  - serverless-offline
