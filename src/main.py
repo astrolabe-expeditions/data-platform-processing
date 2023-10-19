@@ -1,7 +1,7 @@
 import pandas as pd
 pd.options.mode.chained_assignment = None  # default='warn'
-from Helpers import to_numeric, temp_pres_filter, salinity_calculator, drop_invalid_datetime
-from Constants import dict_temp_pres, temp_col_names, ec_col_names, coeffs_salinite
+from helpers import to_numeric, temp_pres_filter, salinity_calculator, drop_invalid_datetime
+from constants import dict_temp_pres, temp_col_names, ec_col_names, coeffs_salinite
 
 
 def run():
@@ -10,7 +10,7 @@ def run():
     return: DataFrame with adequate data treatment done
     """
     ### 1/ Read data => trim column names
-    data = pd.read_csv(r'C:\Users\THEO\Desktop\Projet Commande Entrerprise\combine.csv', delimiter=';')
+    data = pd.read_csv(r'/Users/cballevre/Desktop/combine.csv', delimiter=';')
     data.columns = data.columns.str.strip()
 
     ### 2/ Drop empty rows and duplicate rows
@@ -68,10 +68,8 @@ def run():
     plt.ylabel('Latitude')
     plt.show()
 
-
-
-
     return data.to_csv('data_traitees.csv', index=False,  sep = '|')
 
 
-run()
+if __name__ == "__main__":
+    run()
