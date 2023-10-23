@@ -5,7 +5,6 @@
     "author": "",
     "devDependencies": {
         "serverless-functions-base-path": "^1.0.33",
-        "serverless-offline": "^13.2.0",
         "serverless-scaleway-functions": "^0.4.5"
     },
     "description": ""

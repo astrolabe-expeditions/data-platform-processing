@@ -17,7 +17,12 @@ var/
 *.egg
 __pycache__/
 .pytest_cache/
+venv/
+package
 
 # Serverless directories
 .serverless
 node_modules
+
+# Environments
+.env

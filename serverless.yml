@@ -1,5 +1,7 @@
 service: ae-data-platform
 
+useDotenv: true
+
 provider:
   name: scaleway
 
@@ -7,8 +9,18 @@ provider:
   # List: https://www.scaleway.com/en/docs/serverless/functions/reference-content/functions-lifecycle/#available-runtimes
   runtime: python310
 
+  minScale: 0
+  maxScale: 1
+
   # Scaleway region for the deploy
   scwRegion: fr-par
+
+  # Scaleway organization ID
+  scwProject: ${env:SCW_PROJECT_ID}
+  scwToken: ${env:SCW_TOKEN}
+
+custom:
+  functionsBasePath: src
 
 # Include/exclude directories
 package:
@@ -19,8 +31,8 @@ package:
 
 functions:
   demo:
-    handler: src/demo.run
+    handler: demo.run
 
 plugins:
   - serverless-scaleway-functions
-  - serverless-offline
+  - serverless-functions-base-path
