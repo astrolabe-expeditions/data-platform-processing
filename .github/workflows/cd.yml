@@ -1,7 +1,10 @@
+name: Continous Deployment
 
-name: Build & Deploy to Scaleway
 on:
+  push:
+    branches: [ main ]
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,6 +17,18 @@ jobs:
         password: ${{ secrets.SCALEWAY_API_KEY }}
         registry: ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}
     - name: Build the Docker image
-      run: docker build . -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/ae-data-processing
+      run: docker build . -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/ae-data-processing:latest
     - name: Push the Docker Image
-      run: docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/ae-data-processing
+      run: docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/ae-data-processing:latest
+    - name: Use Node.js 20
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+    - run: yarn install --frozen-lockfile
+    - name: serverless deploy
+      uses: serverless/github-action@v3.2
+      with:
+        args: deploy
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.SCW_PROJECT_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.SCW_TOKEN }}
