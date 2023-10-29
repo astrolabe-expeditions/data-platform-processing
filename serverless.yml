@@ -2,6 +2,8 @@ service: ae-data-platform
 
 useDotenv: true
 
+configValidationMode: off
+
 provider:
   name: scaleway
 
