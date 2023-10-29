@@ -27,9 +27,9 @@ jobs:
     - run: yarn install --frozen-lockfile
     - name: serverless deploy
       uses: serverless/github-action@v3.2
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.SCW_PROJECT_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.SCW_TOKEN }}
       with:
         args: -c "serverless plugin install --name serverless-scaleway-functions && serverless deploy"
         entrypoint: /bin/sh
+      env:
+        SCW_PROJECT_ID: ${{ secrets.SCW_PROJECT_ID }}
+        SCW_TOKEN: ${{ secrets.SCW_TOKEN }}
