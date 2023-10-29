@@ -1539,11 +1539,6 @@ semver@^7.3.5, semver@^7.5.3:
   dependencies:
     lru-cache "^6.0.0"
 
-serverless-functions-base-path@^1.0.33:
-  version "1.0.33"
-  resolved "https://registry.yarnpkg.com/serverless-functions-base-path/-/serverless-functions-base-path-1.0.33.tgz#1c296fe423369a121b6e739cc0186dc0e3cca727"
-  integrity sha512-UX2UIt4Bm9W2EdYgTg3nkdKVtALEpSnMAqBIRRE2aiagvna+3082sbNbfG5oRjsGOqppvdu3FaUDam6W/d+FQQ==
-
 serverless-scaleway-functions@^0.4.5:
   version "0.4.8"
   resolved "https://registry.yarnpkg.com/serverless-scaleway-functions/-/serverless-scaleway-functions-0.4.8.tgz#b894048c8313c68752609578ba3d03f0a6c31195"

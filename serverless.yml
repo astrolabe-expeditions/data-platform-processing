@@ -5,13 +5,6 @@ useDotenv: true
 provider:
   name: scaleway
 
-  # Runtime used for functions (unless overridden)
-  # List: https://www.scaleway.com/en/docs/serverless/functions/reference-content/functions-lifecycle/#available-runtimes
-  runtime: python310
-
-  minScale: 0
-  maxScale: 1
-
   # Scaleway region for the deploy
   scwRegion: fr-par
 
@@ -19,8 +12,8 @@ provider:
   scwProject: ${env:SCW_PROJECT_ID}
   scwToken: ${env:SCW_TOKEN}
 
-custom:
-  functionsBasePath: src
+plugins:
+  - serverless-scaleway-functions
 
 # Include/exclude directories
 package:
@@ -29,10 +22,15 @@ package:
     - "!.gitignore"
     - "!.git/**"
 
-functions:
-  demo:
-    handler: demo.run
+custom:
+  containers:
+    ae-data-platform-processing:
+      registryImage: rg.fr-par.scw.cloud/ae-data-platform/ae-data-platform-processing:latest
+      minScale: 0
+      maxScale: 1
+      memoryLimit: 256
+      port: 8080
+      timeout: 100s
+      env:
+        local: local
 
-plugins:
-  - serverless-scaleway-functions
-  - serverless-functions-base-path
