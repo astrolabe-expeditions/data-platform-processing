@@ -27,7 +27,7 @@ package:
 custom:
   containers:
     ae-data-platform-processing:
-      registryImage: rg.fr-par.scw.cloud/ae-data-platform/ae-data-platform-processing:latest
+      registryImage: ${env:SCW_REGISTRY}/ae-data-platform-processing:latest
       minScale: 0
       maxScale: 1
       memoryLimit: 256
