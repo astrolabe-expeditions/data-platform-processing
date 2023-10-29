@@ -7,37 +7,33 @@ laboratories to enable citizens to actively contribute to scientific research.
 
 Citizens' expeditions are set up to collect large-scale scientific data and involve citizens in understanding and preserving the ocean.
 
-## Installation
+## Local development with docker
 
-```
-npm install -g serverless
-```
+You'll need to have [Docker installed](https://docs.docker.com/get-docker/).
+It's available on Windows, macOS and most distros of Linux.
 
-```
-pip install -r requirements.txt
-```
-
-
-## Testing with serverless offline
-
-In order to test your function locally before deployment in a serverless function, you can install our python offline testing library with:
-
-```bash
-pip install -r requirements-dev.txt
+Clone the repository
+```sh
+git clone git@github.com:astrolabe-expeditions/data-plateform-processing.git
 ```
 
-Launch your function locally:
-
-```bash
-python src/demo.py
+Switch to the repo folder
+```sh
+cd data-plateform-processing
 ```
 
-Test your local function using `curl`:
-
-```bash
-curl localhost:8080
+Copy the example env file and make the required configuration changes in the .env file
+```sh
+cp .env.example .env
 ```
+
+Build everything
+```sh
+docker compose up --build
+```
+
+You can now access the server at [http://localhost:8080](http://localhost:8080)
 
 ## How to contribute?
 
-We are eager for contributions and very happy when we receive them! It can be code, of course, but it can also take other forms. The workflow is explained in [the contributing guide](https://github.com/astrolabe-expeditions/data-platform/blob/dev/docs/CONTRIBUTING.md).
+We are eager for contributions and very happy when we receive them! It can be code, of course, but it can also take other forms. The workflow is explained in [the contributing guide](https://github.com/astrolabe-expeditions/data-plateform-processing/blob/main/docs/CONTRIBUTING.md).
