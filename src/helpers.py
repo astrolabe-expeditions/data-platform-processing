@@ -43,7 +43,7 @@ def trim_all_columns(df):
 
 def drop_null_columns(data): 
     """
-    Drop columns with Nan data to avoid to drop the whole Dataset
+    Drop columns with Nan data to avoid to drop the whole Dataset if there are empty columns
     """
     isnull = data.isnull().values.all(axis=0)
     names_columns_to_drop = []

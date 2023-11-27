@@ -14,8 +14,9 @@ def run():
     data = pd.read_csv(r'C:\Users\kamel\Desktop\IMT Atlantique\A2\Commande Entreprise\Datasets\Données\2021-10-capablanca.csv', delimiter=';')
     data.columns = data.columns.str.strip()
     data = trim_all_columns(data)
-    ## we replace all empty strings by NaN and drop the empty columns
+    ## we replace all empty strings by NaN
     data.replace('',np.nan,regex = True, inplace=True)
+    ## we drop the empty columns
     drop_null_columns(data)
 
     ### 2/ Drop empty rows and duplicate rows
