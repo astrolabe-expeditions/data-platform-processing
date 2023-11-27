@@ -33,6 +33,26 @@ def to_numeric(df, col_list):
         df[col] = pd.to_numeric(df[col], errors='coerce')
     return df
 
+
+def trim_all_columns(df):
+    """
+    Trim whitespace from ends of each value across all series in dataframe
+    """
+    trim_strings = lambda x: x.strip() if isinstance(x, str) else x
+    return df.applymap(trim_strings)
+
+def drop_null_columns(data): 
+    """
+    Drop columns with Nan data to avoid to drop the whole Dataset
+    """
+    isnull = data.isnull().values.all(axis=0)
+    names_columns_to_drop = []
+    for i in range(len(isnull)):
+        if isnull[i] == True : 
+            names_columns_to_drop.append(data.columns[i])
+    for k in names_columns_to_drop : 
+        data.drop([k], axis=1, inplace=True)
+
 def temp_pres_filter(df, dict):
     """
     Filters a df based on columns and related constant values set in a dictionnary
