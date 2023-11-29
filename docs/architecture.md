@@ -68,3 +68,16 @@ erDiagram
     sensors ||--o{ records : contains
     sensors ||--o{ files : contains
 ```
+
+## Interacting with the interface
+
+```mermaid
+sequenceDiagram
+    Web app->>+S3: Upload file
+    Web app->>+Cloud function: Call with the id of the file to process
+    Cloud function->>+Database: Get the file data and put status to process
+    Cloud function->>+S3: Get the CSV file
+    Cloud function->>+Cloud function: Processing the file
+    Cloud function->>+Database: Upload data into records with sensor_id corresponding
+    Cloud function->>+Database: Set file status processed
+```
