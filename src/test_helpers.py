@@ -5,7 +5,7 @@ You will find here unitary tests for helpers functions
 
 import pandas as pd
 import numpy as np
-from Helpers import drop_invalid_datetime,to_numeric
+from helpers import drop_invalid_datetime,to_numeric
 
 def test_drop_invalid_datetime():
     ''' 
