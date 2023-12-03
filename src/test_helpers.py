@@ -5,7 +5,7 @@ You will find here unitary tests for helpers functions
 
 import pandas as pd
 import numpy as np
-from helpers import drop_invalid_datetime,to_numeric
+from helpers import drop_invalid_datetime,to_numeric,trim_all_columns
 
 def test_drop_invalid_datetime():
     ''' 
@@ -87,16 +87,27 @@ def test_to_numeric():
     assert not np.isnan(df['ec_2'][0]), "la fonction renvoie np.nan pour des valeurs normalement transformées en numérique"
     assert list(df['str']) == data['str'], "la fonction traite des colonnes qu'elle ne devrait pas traiter"
 
+def test_trim_all_columns():
+    data = {
+        'A ' : [4     , 8   , 10.4 , 'oui'],
+        ' B' : [' z'  , 'e ', ' r ', '   '],
+        ' C ': [np.nan, 5   , 10   , 'h'  ]
+    }
+    df = pd.DataFrame(data)
+    df_changed = trim_all_columns(df)
 
-# def to_numeric(df, col_list):
-#     """
-#     :param df: df to trasnform
-#     :param col_list: names of the columns for which we want to change the types to numeric
-#     :return: df with selected columns to numeric
-#     """
-#     for col in col_list:
-#         df[col] = pd.to_numeric(df[col], errors='coerce')
-#     return df
+    try:
+        A = df_changed['A']
+        B = df_changed['B']
+        C = df_changed['C']
+    except KeyError:
+        print("the function doesn't trim columns names")
+    assert df['A '].equals(df_changed['A']), "the function modify columns that are already ok"
+    assert df[' C '].equals(df_changed['C']), "the function modify columns that are already ok"
+    assert df_changed['B'].isin(['z']).any(), "the function doesn't trim spaces before values"
+    assert df_changed['B'].isin(['e']).any(), "the function doesn't trim spaces after values"
+    assert df_changed['B'].isin(['r']).any(), "the function doesn't trim spaces around values"
+    assert df_changed['B'].isin(['']).any(), "the function doesn't trim empty strings"
 
 # def trim_all_columns(df):
 #     """
