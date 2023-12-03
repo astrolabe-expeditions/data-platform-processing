@@ -94,6 +94,7 @@ def test_trim_all_columns():
         ' C ': [np.nan, 5   , 10   , 'h'  ]
     }
     df = pd.DataFrame(data)
+    df_unchanged = df.copy()
     df_changed = trim_all_columns(df)
 
     try:
@@ -102,8 +103,8 @@ def test_trim_all_columns():
         C = df_changed['C']
     except KeyError:
         print("the function doesn't trim columns names")
-    assert df['A '].equals(df_changed['A']), "the function modify columns that are already ok"
-    assert df[' C '].equals(df_changed['C']), "the function modify columns that are already ok"
+    assert df_unchanged['A '].equals(df_changed['A']), "the function modify columns that are already ok"
+    assert df_unchanged[' C '].equals(df_changed['C']), "the function modify columns that are already ok"
     assert df_changed['B'].isin(['z']).any(), "the function doesn't trim spaces before values"
     assert df_changed['B'].isin(['e']).any(), "the function doesn't trim spaces after values"
     assert df_changed['B'].isin(['r']).any(), "the function doesn't trim spaces around values"
