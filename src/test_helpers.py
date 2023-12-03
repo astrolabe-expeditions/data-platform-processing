@@ -5,7 +5,7 @@ You will find here unitary tests for helpers functions
 
 import pandas as pd
 import numpy as np
-from helpers import drop_invalid_datetime,to_numeric,trim_all_columns
+from helpers import drop_invalid_datetime,to_numeric,trim_all_columns,drop_null_columns
 
 def test_drop_invalid_datetime():
     ''' 
@@ -110,12 +110,30 @@ def test_trim_all_columns():
     assert df_changed['B'].isin(['r']).any(), "the function doesn't trim spaces around values"
     assert df_changed['B'].isin(['']).any(), "the function doesn't trim empty strings"
 
-# def trim_all_columns(df):
-#     """
-#     Trim whitespace from ends of each value across all series in dataframe
-#     """
-#     trim_strings = lambda x: x.strip() if isinstance(x, str) else x
-#     return df.applymap(trim_strings)
+def test_drop_null_columns():
+    data1 = {
+        'A' : [0, 1, 2, 3],
+        'B' : [2, 'oui', None, 4]
+    }
+
+    data2 = {
+        'A' : [0, 1, 2, 3],
+        'B' : [2, 'oui', None, 4],
+        'C' : [None, None, None, None]
+    }
+
+    df1 = pd.DataFrame(data1)
+    df1_changed = df1.copy()
+    df2 = pd.DataFrame(data2)
+    df2_changed = df2.copy()
+    drop_null_columns(df1_changed)
+    drop_null_columns(df2_changed)
+
+    assert df1.equals(df1_changed), "La fonction enlève des colonnes comportant des données"
+    assert df1.equals(df2_changed), "la fonction n'enlève pas les colonnes "
+
+    
+
 
 # def drop_null_columns(data): 
 #     """
