@@ -1,6 +1,7 @@
 import pandas as pd
+import numpy as np
 pd.options.mode.chained_assignment = None  # default='warn'
-from helpers import to_numeric, temp_pres_filter, salinity_calculator, drop_invalid_datetime
+from helpers import to_numeric, temp_pres_filter, salinity_calculator, drop_invalid_datetime, trim_all_columns, drop_null_columns
 from constants import dict_temp_pres, temp_col_names, ec_col_names, coeffs_salinite
 
 
@@ -9,9 +10,14 @@ def run():
     Main function to execute.
     return: DataFrame with adequate data treatment done
     """
-    ### 1/ Read data => trim column names
-    data = pd.read_csv(r'/Users/cballevre/Desktop/combine.csv', delimiter=';')
+    ### 1/ Read data => trim column names and drop empty columns
+    data = pd.read_csv(r'C:\Users\kamel\Desktop\IMT Atlantique\A2\Commande Entreprise\Datasets\Données\2021-10-capablanca.csv', delimiter=';')
     data.columns = data.columns.str.strip()
+    data = trim_all_columns(data)
+    ## we replace all empty strings by NaN
+    data.replace('',np.nan,regex = True, inplace=True)
+    ## we drop the empty columns
+    drop_null_columns(data)
 
     ### 2/ Drop empty rows and duplicate rows
     data.dropna(inplace=True)
@@ -44,6 +50,8 @@ def run():
     data['Ec_mean'] = ec_mean
     data['Salinity'] = sal_mean
 
+    data.to_csv('data_traitees_test_capablanca.csv', index=False,  sep = ';')
+
     ###################################################################################
 
     # Vizualisation trials
@@ -68,7 +76,7 @@ def run():
     plt.ylabel('Latitude')
     plt.show()
 
-    return data.to_csv('data_traitees.csv', index=False,  sep = '|')
+    
 
 
 if __name__ == "__main__":
