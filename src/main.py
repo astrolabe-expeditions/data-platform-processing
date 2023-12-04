@@ -12,7 +12,6 @@ def run():
     """
     ### 1/ Read data => trim column names and drop empty columns
     data = pd.read_csv(r'C:\Users\kamel\Desktop\IMT Atlantique\A2\Commande Entreprise\Datasets\Données\2021-10-capablanca.csv', delimiter=';')
-    data.columns = data.columns.str.strip()
     data = trim_all_columns(data)
     ## we replace all empty strings by NaN
     data.replace('',np.nan,regex = True, inplace=True)
