@@ -8,6 +8,8 @@ The same can be applied to set constant values to filter temperatures, pressure,
 # min and max value for filters
 temp_min_value = -20
 temp_max_value = 100
+temp_ext_min_value = -20
+temp_ext_max_value = 100
 pres_min_value = 70
 pres_max_value = 2000
 ec_min_value = -100000
