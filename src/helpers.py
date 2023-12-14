@@ -34,7 +34,7 @@ def to_numeric(df, col_list):
     return df
 
 
-def process_columns(df, temp_min_value, temp_max_value, pres_min_value, pres_max_value, ec_min_value, ec_max_value):
+def process_columns(df, temp_min_value, temp_max_value, temp_ext_min_value, temp_ext_max_value, pres_min_value, pres_max_value, ec_min_value, ec_max_value):
     """
     :param df: input df
     :param min_value: min value to filter data
@@ -54,9 +54,13 @@ def process_columns(df, temp_min_value, temp_max_value, pres_min_value, pres_max
             # Create a sub-dictionary for each column and set min and max values
             dict_temp_pres_ec[col] = {}
             if col.startswith('Temp'):
-                dict_temp_pres_ec[col]['min'] = temp_min_value
-                dict_temp_pres_ec[col]['max'] = temp_max_value
-                temp_columns.append(col)
+                if "ext" in col.lower():
+                    dict_temp_pres_ec[col]['min'] = temp_ext_min_value
+                    dict_temp_pres_ec[col]['max'] = temp_ext_max_value
+                else:
+                    dict_temp_pres_ec[col]['min'] = temp_min_value
+                    dict_temp_pres_ec[col]['max'] = temp_max_value
+                    temp_columns.append(col)
             elif col.startswith('Pres'):
                 dict_temp_pres_ec[col]['min'] = pres_min_value
                 dict_temp_pres_ec[col]['max'] = pres_max_value
