@@ -121,14 +121,31 @@ def salinity_calculator(temperature, conductivity, coeffs):
                 + (((temperature - 15)/(1 + coeffs["K"] * (temperature - 15)))
                     * (sum([coeffs['B'][i] * R_t**(int(i)/2.) for i in range(6)]))))
 
-def concat_temp(df):
+def to_unique_col(df):
     """
-    Concatenates temperatures value to create a list of list of all temperatures value.
+    Concatenates temp, ec, depth values to create a single columns made of list
+    temp_sea column will look like:
+         [[temp_sea_1(row_1), temp_sea_2(row_1),...,temp_sea_n(row_1)],..., [temp_sea_1(row_m), temp_sea_2(row_m),...,temp_sea_n(row_m)]
     :param df:input df with all columns
-    :return: array like [[temp_sea_1(row_1), temp_sea_2(row_1),...,temp_sea_n(row_1)],..., [temp_sea_1(row_m), temp_sea_2(row_m),...,temp_sea_n(row_m)]
+    :return: new df
     """
+    # Identify columns
+    temp_cols = [col for col in df.columns if col.lower().startswith('temp')]
+    ec_cols = [col for col in df.columns if col.lower().startswith('ec')]
+    depth_cols = [col for col in df.columns if col.lower().startswith('depth')]
 
-    df_temp_columns = df[[col for col in df.columns if col.lower().startswith('temp')]]
-    array = df_temp_columns.values().tolist()
-    return array
+    # Concatenate values into lists
+    df["temp_sea"] = df[temp_cols].values().tolist()
+    df["ec_sea"] = df[ec_cols].values().tolist()
+    df["depth"] = df[depth_cols].values().tolist()
 
+    return df
+
+def add_id(df):
+    """
+    Add an incremental 'id' column in the beginning of the df
+    :param df: input df
+    :return: new df with id column added
+    """
+    df["id"] = df.index + 1
+    return df
