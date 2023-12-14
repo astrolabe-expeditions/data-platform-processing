@@ -34,27 +34,41 @@ def to_numeric(df, col_list):
     return df
 
 
-def trim_all_columns(df):
+def process_columns(df, temp_min_value, temp_max_value, pres_min_value, pres_max_value, ec_min_value, ec_max_value):
     """
-    Trim whitespace from ends of each value across all series in dataframe
+    :param df: input df
+    :param min_value: min value to filter data
+    :param max_value: max value to filter data
+    :return: dictionnary with min and max values; list of temp columns; list of pressure columns; list of EC columns
     """
-    df.columns = df.columns.str.strip()
-    trim_strings = lambda x: x.strip() if isinstance(x, str) else x
-    return df.applymap(trim_strings)
+    # Dictionary to store values for columns starting with 'Temp' or 'Pres'
+    dict_temp_pres_ec = {}
 
-def drop_null_columns(data): 
-    """
-    Drop columns with Nan data to avoid to drop the whole Dataset if there are empty columns
-    """
-    isnull = data.isnull().values.all(axis=0)
-    names_columns_to_drop = []
-    for i in range(len(isnull)):
-        if isnull[i] == True : 
-            names_columns_to_drop.append(data.columns[i])
-    for k in names_columns_to_drop : 
-        data.drop([k], axis=1, inplace=True)
+    # Lists for columns starting with 'Temp', 'EC', and 'Pres'
+    temp_columns = []
+    ec_columns = []
+    pres_columns = []
 
-def temp_pres_filter(df, dict):
+    for col in df.columns:
+        if col.startswith('Temp') or col.startswith('Pres') or col.startswith('EC'):
+            # Create a sub-dictionary for each column and set min and max values
+            dict_temp_pres_ec[col] = {}
+            if col.startswith('Temp'):
+                dict_temp_pres_ec[col]['min'] = temp_min_value
+                dict_temp_pres_ec[col]['max'] = temp_max_value
+                temp_columns.append(col)
+            elif col.startswith('Pres'):
+                dict_temp_pres_ec[col]['min'] = pres_min_value
+                dict_temp_pres_ec[col]['max'] = pres_max_value
+                pres_columns.append(col)
+            else:
+                dict_temp_pres_ec[col]['min'] = ec_min_value
+                dict_temp_pres_ec[col]['max'] = ec_max_value
+                ec_columns.append(col)
+
+    return dict_temp_pres_ec, temp_columns, ec_columns, pres_columns
+
+def temp_pres_ec_filter(df, dict):
     """
     Filters a df based on columns and related constant values set in a dictionnary
     :param df: input DataFrame
@@ -63,7 +77,7 @@ def temp_pres_filter(df, dict):
     """
     df.reset_index(inplace=True, drop=True)
     for name in dict.keys():
-        df = df[df[name].between(dict[name]["temp_min"], dict[name]["temp_max"])]
+        df = df[df[name].between(dict[name]["min"], dict[name]["max"])]
     return df
 
 def salinity_calculator(temperature, conductivity, coeffs):
