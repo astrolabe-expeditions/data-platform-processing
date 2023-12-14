@@ -121,3 +121,14 @@ def salinity_calculator(temperature, conductivity, coeffs):
                 + (((temperature - 15)/(1 + coeffs["K"] * (temperature - 15)))
                     * (sum([coeffs['B'][i] * R_t**(int(i)/2.) for i in range(6)]))))
 
+def concat_temp(df):
+    """
+    Concatenates temperatures value to create a list of list of all temperatures value.
+    :param df:input df with all columns
+    :return: array like [[temp_sea_1(row_1), temp_sea_2(row_1),...,temp_sea_n(row_1)],..., [temp_sea_1(row_m), temp_sea_2(row_m),...,temp_sea_n(row_m)]
+    """
+
+    df_temp_columns = df[[col for col in df.columns if col.lower().startswith('temp')]]
+    array = df_temp_columns.values().tolist()
+    return array
+
