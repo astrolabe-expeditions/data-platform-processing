@@ -135,9 +135,23 @@ def to_unique_col(df):
     depth_cols = [col for col in df.columns if col.lower().startswith('depth')]
 
     # Concatenate values into lists
-    df["temp_sea"] = df[temp_cols].values().tolist()
-    df["ec_sea"] = df[ec_cols].values().tolist()
-    df["depth"] = df[depth_cols].values().tolist()
+    if depth_cols:
+        df["depth"] = df[depth_cols].values.tolist()
+        df.drop(columns=depth_cols, inplace=True)
+    else:
+        df["depth"] = [[] for _ in range(len(df))]
+
+    if temp_cols:
+        df["temp_sea"] = df[temp_cols].values.tolist()
+        df.drop(columns=temp_cols, inplace=True)
+    else:
+        df["temp_sea"] = [[] for _ in range(len(df))]
+
+    if ec_cols:
+        df["ec_sea"] = df[ec_cols].values.tolist()
+        df.drop(columns=ec_cols, inplace=True)
+    else:
+        df["ec_sea"] = [[] for _ in range(len(df))]
 
     return df
 
