@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 pd.options.mode.chained_assignment = None  # default='warn'
-from helpers import to_numeric, temp_pres_ec_filter, salinity_calculator, drop_invalid_datetime, trim_all_columns, drop_null_columns, process_columns
+from helpers import to_numeric, temp_pres_ec_filter, salinity_calculator, drop_invalid_datetime, trim_all_columns, drop_null_columns, process_columns, to_unique_col, add_id
 from constants import coeffs_salinite, temp_min_value, temp_max_value, temp_ext_min_value, temp_ext_max_value, pres_min_value, pres_max_value, ec_min_value, ec_max_value
 
 
@@ -64,6 +64,12 @@ def run():
     data['Temp_mean'] = temp_mean
     data['Ec_mean'] = ec_mean
     data['Salinity'] = sal_mean
+    
+    ### 13/ Merge temp, ec, and depth columns into one column
+    data = to_unique_col(data)
+    
+    ### 14/ Add 'id' column
+    data = add_id(data)
 
     data.to_csv('data_traitees_test_capablanca.csv', index=False,  sep = ';')
 
