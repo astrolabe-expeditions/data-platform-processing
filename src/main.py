@@ -64,41 +64,14 @@ def run():
     data['Temp_mean'] = temp_mean
     data['Ec_mean'] = ec_mean
     data['Salinity'] = sal_mean
-    
+
     ### 13/ Merge temp, ec, and depth columns into one column
     data = to_unique_col(data)
-    
+
     ### 14/ Add 'id' column
     data = add_id(data)
 
-    data.to_csv('data_traitees_test_capablanca.csv', index=False,  sep = ';')
-
-    ###################################################################################
-
-    # Vizualisation trials
-    """
-    NB: I was in the train with no WiFi so I used matplotlib
-    Other libraries might be more suitable to add a better font (world map for example)
-    """
-
-    import matplotlib.pyplot as plt
-
-    plt.scatter(data.Lat, data.Lng, c=data.Temp_mean, cmap='coolwarm')
-    plt.colorbar(label='Temperature')
-    plt.title("Temperature map")
-    plt.xlabel('Longitude')
-    plt.ylabel('Latitude')
-    plt.show()
-
-    plt.scatter(data.Lat, data.Lng, c=data.Salinity, cmap='coolwarm')
-    plt.colorbar(label='Salinity')
-    plt.title("Salinity map")
-    plt.xlabel('Longitude')
-    plt.ylabel('Latitude')
-    plt.show()
-
-    
-
+    return data
 
 if __name__ == "__main__":
     run()
