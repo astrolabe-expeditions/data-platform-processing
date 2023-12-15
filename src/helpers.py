@@ -23,26 +23,14 @@ def drop_invalid_datetime(df):
 
     return df
 
-def to_numeric(df, col_list):
-    """
-    :param df: df to trasnform
-    :param col_list: names of the columns for which we want to change the types to numeric
-    :return: df with selected columns to numeric
-    """
-    for col in col_list:
-        df[col] = pd.to_numeric(df[col], errors='coerce')
-    return df
-
 
 def process_columns(df, temp_min_value, temp_max_value, temp_ext_min_value, temp_ext_max_value, pres_min_value, pres_max_value, ec_min_value, ec_max_value):
     """
     :param df: input df
     :param min_value: min value to filter data
     :param max_value: max value to filter data
-    :return: dictionnary with min and max values; list of temp columns; list of pressure columns; list of EC columns
+    :return: processed dataframe; list of temp columns; list of pressure columns; list of EC columns
     """
-    # Dictionary to store values for columns starting with 'Temp' or 'Pres'
-    dict_temp_pres_ec = {}
 
     # Lists for columns starting with 'Temp', 'EC', and 'Pres'
     temp_columns = []
@@ -50,27 +38,27 @@ def process_columns(df, temp_min_value, temp_max_value, temp_ext_min_value, temp
     pres_columns = []
 
     for col in df.columns:
+        # find relevant columns
         if col.startswith('Temp') or col.startswith('Pres') or col.startswith('EC'):
-            # Create a sub-dictionary for each column and set min and max values
-            dict_temp_pres_ec[col] = {}
+            # set adequate format 
+            df[col] = pd.to_numeric(col, errors = 'coerce')
+            # filter columns based on col dimension
             if col.startswith('Temp'):
                 if "ext" in col.lower():
-                    dict_temp_pres_ec[col]['min'] = temp_ext_min_value
-                    dict_temp_pres_ec[col]['max'] = temp_ext_max_value
+                    df[col] = temp_pres_ec_filter(col,temp_ext_min_value,temp_ext_max_value)
                 else:
-                    dict_temp_pres_ec[col]['min'] = temp_min_value
-                    dict_temp_pres_ec[col]['max'] = temp_max_value
+                    df[col] = temp_pres_ec_filter(col,temp_min_value,temp_max_value)
                     temp_columns.append(col)
             elif col.startswith('Pres'):
-                dict_temp_pres_ec[col]['min'] = pres_min_value
-                dict_temp_pres_ec[col]['max'] = pres_max_value
+                df[col] = temp_pres_ec_filter(col, pres_min_value, pres_max_value)
                 pres_columns.append(col)
             else:
-                dict_temp_pres_ec[col]['min'] = ec_min_value
-                dict_temp_pres_ec[col]['max'] = ec_max_value
+                df[col] = temp_pres_ec_filter(col, ec_min_value,ec_max_value)
                 ec_columns.append(col)
-
-    return dict_temp_pres_ec, temp_columns, ec_columns, pres_columns
+            # drop null values and reset index
+            df.dropna(inplace = True)
+            df.reset_index(inplace = True, drop = True)
+    return df, temp_columns, ec_columns, pres_columns
 
 
 def trim_all_columns(df):
@@ -93,17 +81,16 @@ def drop_null_columns(data):
     for k in names_columns_to_drop : 
         data.drop([k], axis=1, inplace=True)
 
-def temp_pres_ec_filter(df, dict):
+def temp_pres_ec_filter(col, mini, maxi):
     """
-    Filters a df based on columns and related constant values set in a dictionnary
-    :param df: input DataFrame
-    :param dict: dictionnary with column names as keys
-    :return: filtered DataFrame
+    Filters a column based on min and max values
+    :param col: input column
+    :param mini: float value minimum accepted
+    :param maxi: float value maximum accepted
+    :return: filtered column
     """
-    df.reset_index(inplace=True, drop=True)
-    for name in dict.keys():
-        df = df[df[name].between(dict[name]["min"], dict[name]["max"])]
-    return df
+    col = col.between(mini, maxi)
+    return col
 
 def salinity_calculator(temperature, conductivity, coeffs):
     """
@@ -155,11 +142,3 @@ def to_unique_col(df):
 
     return df
 
-def add_id(df):
-    """
-    Add an incremental 'id' column in the beginning of the df
-    :param df: input df
-    :return: new df with id column added
-    """
-    df["id"] = df.index + 1
-    return df

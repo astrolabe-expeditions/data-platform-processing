@@ -27,8 +27,8 @@ def run():
     ### 5/ Drop columns where dates and/or times do not match the format
     data = drop_invalid_datetime(data)
 
-    ### 6/ Create dictionnary with temp and pres boundaries, and lists of columns for temp, ec, pressure
-    dict_temp_pres_ec, temp_col_names, ec_col_names, pres_col_names =\
+    ### 6/ filter temp, pres and ec in dataframe and lists of columns for temp, ec, pressure
+    data, temp_col_names, ec_col_names, pres_col_names =\
                 process_columns(data,
                                 temp_min_value,
                                 temp_max_value,
@@ -39,37 +39,21 @@ def run():
                                 ec_min_value,
                                 ec_max_value)
 
-
-    ### 7/ Set adequate format for relevant columns:
-    data = to_numeric(data, ec_col_names)
-    data = to_numeric(data, temp_col_names)
-    data = to_numeric(data, pres_col_names)
-
-    ### 8/ Reset index, drop NaN values
-    data.reset_index(inplace=True, drop=True)
-    data.dropna(inplace=True)
-
-    ### 9/ Filter on temperature
-    data = temp_pres_ec_filter(data, dict_temp_pres_ec)
-
-    ### 10/ Calculation of EC and temperatures means
+    ### 7/ Calculation of EC and temperatures means
     temp_mean = data[temp_col_names].mean(axis=1)
     ec_mean = data[ec_col_names].mean(axis=1)
     sal_mean = salinity_calculator(temp_mean, ec_mean / 1000, coeffs_salinite)
 
-    ### 11/ Creation of Datetime column (for later vizualisation purposes)
+    ### 8/ Creation of Datetime column (for later vizualisation purposes)
     data['Datetime'] = pd.to_datetime(data['Date'].astype(str) + ' ' + data['Time'].astype(str), format='%Y-%m-%d %H:%M:%S')
 
-    ### 12/ Add calculated value to our data
+    ### 9/ Add calculated value to our data
     data['Temp_mean'] = temp_mean
     data['Ec_mean'] = ec_mean
     data['Salinity'] = sal_mean
 
-    ### 13/ Merge temp, ec, and depth columns into one column
+    ### 10/ Merge temp, ec, and depth columns into one column
     data = to_unique_col(data)
-
-    ### 14/ Add 'id' column
-    data = add_id(data)
 
     return data
 
