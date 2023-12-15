@@ -45,15 +45,15 @@ def process_columns(df, temp_min_value, temp_max_value, temp_ext_min_value, temp
             # filter columns based on col dimension
             if col.startswith('Temp'):
                 if "ext" in col.lower():
-                    df[col] = temp_pres_ec_filter(col,temp_ext_min_value,temp_ext_max_value)
+                    df = df[temp_pres_ec_filter(col,temp_ext_min_value,temp_ext_max_value)]
                 else:
-                    df[col] = temp_pres_ec_filter(col,temp_min_value,temp_max_value)
+                    df = df[temp_pres_ec_filter(col,temp_min_value,temp_max_value)]
                     temp_columns.append(col)
             elif col.startswith('Pres'):
-                df[col] = temp_pres_ec_filter(col, pres_min_value, pres_max_value)
+                df = df[temp_pres_ec_filter(col, pres_min_value, pres_max_value)]
                 pres_columns.append(col)
             else:
-                df[col] = temp_pres_ec_filter(col, ec_min_value,ec_max_value)
+                df = df[temp_pres_ec_filter(col, ec_min_value,ec_max_value)]
                 ec_columns.append(col)
             # drop null values and reset index
             df.dropna(inplace = True)
