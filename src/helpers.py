@@ -23,6 +23,16 @@ def drop_invalid_datetime(df):
 
     return df
 
+def to_numeric(df, col_list):
+    """
+    :param df: df to trasnform
+    :param col_list: names of the columns for which we want to change the types to numeric
+    :return: df with selected columns to numeric
+    """
+    for col in col_list:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+    return df
+
 
 def process_columns(df, temp_min_value, temp_max_value, temp_ext_min_value, temp_ext_max_value, pres_min_value, pres_max_value, ec_min_value, ec_max_value):
     """
@@ -41,19 +51,19 @@ def process_columns(df, temp_min_value, temp_max_value, temp_ext_min_value, temp
         # find relevant columns
         if col.startswith('Temp') or col.startswith('Pres') or col.startswith('EC'):
             # set adequate format 
-            df[col] = pd.to_numeric(col, errors = 'coerce')
+            df[col] = pd.to_numeric(df[col], errors = 'coerce')
             # filter columns based on col dimension
             if col.startswith('Temp'):
                 if "ext" in col.lower():
-                    df = df[temp_pres_ec_filter(col,temp_ext_min_value,temp_ext_max_value)]
+                    df = df[temp_pres_ec_filter(df[col],temp_ext_min_value,temp_ext_max_value)]
                 else:
-                    df = df[temp_pres_ec_filter(col,temp_min_value,temp_max_value)]
+                    df = df[temp_pres_ec_filter(df[col],temp_min_value,temp_max_value)]
                     temp_columns.append(col)
             elif col.startswith('Pres'):
-                df = df[temp_pres_ec_filter(col, pres_min_value, pres_max_value)]
+                df = df[temp_pres_ec_filter(df[col], pres_min_value, pres_max_value)]
                 pres_columns.append(col)
             else:
-                df = df[temp_pres_ec_filter(col, ec_min_value,ec_max_value)]
+                df = df[temp_pres_ec_filter(df[col], ec_min_value,ec_max_value)]
                 ec_columns.append(col)
             # drop null values and reset index
             df.dropna(inplace = True)
@@ -141,4 +151,33 @@ def to_unique_col(df):
         df["ec_sea"] = [[] for _ in range(len(df))]
 
     return df
+
+
+def rename_columns(data):
+    for col in data.columns:
+        if col.startswith('Lat') : 
+            data.columns = data.columns.str.replace(col, "latitude")
+        if col.startswith('Lng') : 
+            data.columns = data.columns.str.replace(col, "longitude")
+        if col.startswith('Date') : 
+            data.columns = data.columns.str.replace(col, "recorded_at")
+        if col.startswith('Bat %') : 
+            data.columns = data.columns.str.replace(col, "battery_percentage")
+        if col.startswith('Bat mV') : 
+            data.columns = data.columns.str.replace(col, "battery_voltage")
+        if col.startswith('Pression_ext') : 
+            data.columns = data.columns.str.replace(col, "pression_ext")
+        if col.startswith('Temp_ext') : 
+            data.columns = data.columns.str.replace(col, "temp_ext")
+        if col.startswith('Temp_int') : 
+            data.columns = data.columns.str.replace(col, "temp_int")
+        if col.startswith('Temp_sea') : 
+            data.columns = data.columns.str.replace(col, "temp_sea")
+        if col.startswith('EC_sea') : 
+            data.columns = data.columns.str.replace(col, "ec_sea")
+        if col.startswith('Profondeur') : 
+            data.columns = data.columns.str.replace(col, "depth")
+
+
+
 
