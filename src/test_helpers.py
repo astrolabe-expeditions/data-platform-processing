@@ -3,9 +3,15 @@
 You will find here unitary tests for helpers functions
 """
 
+#############################################################################################################################################################################
+
 import pandas as pd
 import numpy as np
-from helpers import drop_invalid_datetime,to_numeric,trim_all_columns,drop_null_columns
+from helpers import drop_invalid_datetime, to_numeric, trim_all_columns, drop_null_columns, process_columns, to_unique_col, temp_pres_filter
+
+#############################################################################################################################################################################
+
+### Test of 'drop_invalid_datetime'
 
 def test_drop_invalid_datetime():
     ''' 
@@ -65,6 +71,10 @@ def test_drop_invalid_datetime():
     assert pd.to_datetime('20/02/03', format='%y/%m/%d').date() in df["Date"].values, "les dates avec un espace après sont supprimés et non modifiées"
     assert pd.to_datetime('20/02/04', format='%y/%m/%d').date() in df["Date"].values, "les dates avec un espace avant et après sont supprimés et non modifiées"
 
+#############################################################################################################################################################################
+
+### Test of 'to_numeric'
+
 def test_to_numeric():
     """
     tests done: 
@@ -86,6 +96,10 @@ def test_to_numeric():
     assert not df['ec_2'].isin([np.pi, 'np.pi', 10**23, '10**23', '', 'O']).all(), "la fonction ne traite pas des valeurs normalement traitées par pd.to_numeric"
     assert not np.isnan(df['ec_2'][0]), "la fonction renvoie np.nan pour des valeurs normalement transformées en numérique"
     assert list(df['str']) == data['str'], "la fonction traite des colonnes qu'elle ne devrait pas traiter"
+
+#############################################################################################################################################################################
+
+### Test of 'trim_all_columns'
 
 def test_trim_all_columns():
     data = {
@@ -110,6 +124,10 @@ def test_trim_all_columns():
     assert df_changed['B'].isin(['r']).any(), "the function doesn't trim spaces around values"
     assert df_changed['B'].isin(['']).any(), "the function doesn't trim empty strings"
 
+#############################################################################################################################################################################
+
+### Test of 'drop_null_columns'
+
 def test_drop_null_columns():
     data1 = {
         'A' : [0, 1, 2, 3],
@@ -132,87 +150,230 @@ def test_drop_null_columns():
     assert df1.equals(df1_changed), "La fonction enlève des colonnes comportant des données"
     assert df1.equals(df2_changed), "la fonction n'enlève pas les colonnes "
 
-    
+#############################################################################################################################################################################
+
+### test of 'temp_pres_filer'
+
+def test_temp_pres_filter():
+    # data example
+    data = {'temperature': [25, 30, 18, 22, 35],
+            'pressure': [1000, 950, 1050, 980, 990]}
+    df = pd.DataFrame(data)
+    dict = {'temperature': {'temp_min': 20, 'temp_max': 30},
+            'pressure': {'temp_min': 980, 'temp_max': 1000}}
+
+    filtered_df = temp_pres_filter(df, dict)
+    filtered_df.reset_index(drop=True, inplace=True)
+
+    # compare the result with expected results
+    expected_data = {'temperature': [25, 22], 'pressure': [1000, 980]}
+    expected_df = pd.DataFrame(expected_data)
+    pd.testing.assert_frame_equal(filtered_df, expected_df)
+
+
+#############################################################################################################################################################################
+
+### Test of 'process_columns'
+
+# Unitary test function
 def test_process_columns():
+    data = {
+    'Temp_1': [25, 30, 35, None, 45],  # Add a null value for testing
+    'Temp_2': [20, 25, 30, 35, 40],
+    'Pres_1': [1000, 1010, 1020, 1030, 1040],
+    'Pres_2': [990, None, 1010, 1020, 1030],  #Add a null value for testing
+    'EC_1': [5, 10, 15, 20, 25],
+    'EC_2': [8, 12, 16, 'invalid', 24]  # Add not numerical value for testing
+    }
+    
+    df = pd.DataFrame(data)
+    
+    # Define values for filters
+    temp_min = 25
+    temp_max = 40
+    temp_ext_min = 20
+    temp_ext_max = 45
+    pres_min = 1000
+    pres_max = 1030
+    ec_min = 5
+    ec_max = 20
+    
     processed_df, temp_cols, ec_cols, pres_cols = process_columns(df, temp_min, temp_max, temp_ext_min, temp_ext_max, pres_min, pres_max, ec_min, ec_max)
 
-    # Vérifier que les colonnes sont correctement filtrées et renvoyées
-    assert processed_df.shape[1] == 6  # Vérifie que le nombre de colonnes est correct après le traitement
-    assert 'Temp_1' in temp_cols  # Vérifie si la colonne Temp_1 est ajoutée à temp_cols
-    assert 'EC_1' in ec_cols  # Vérifie si la colonne EC_1 est ajoutée à ec_cols
-    assert 'Pres_1' in pres_cols  # Vérifie si la colonne Pres_1 est ajoutée à pres_cols
-    assert processed_df['Temp_1'].notnull().all()  # Vérifie si aucune valeur vide dans la colonne Temp_1 du DataFrame final
-    assert processed_df['Pres_2'].notnull().all()  # Vérifie si aucune valeur vide dans la colonne Pres_2 du DataFrame final
-    assert processed_df['EC_2'].apply(pd.to_numeric, errors='coerce').notnull().all()  # Vérifie si toutes les valeurs de la colonne EC_2 sont numériques
+    # Assertions
+    assert processed_df.shape[1] == 6  # Check number of columns
+    assert 'Temp_1' in temp_cols  # Check if Temp_1 is in the temp_cols list
+    assert 'EC_1' in ec_cols  # Check if EC_1 is in ec_cols list
+    assert 'Pres_1' in pres_cols  # Check if Pres_1 is in ec_cols list
+    assert processed_df['Temp_1'].notnull().all()  # Check that there is no null value in Temp_1 column in the final df
+    assert processed_df['Pres_2'].notnull().all()  # Check that there is no null value in Pres_2 column in the final df
+    assert processed_df['EC_2'].apply(pd.to_numeric, errors='coerce').notnull().all()  # Check that all EC_2 values are numeric
     assert processed_df.applymap(lambda x: isinstance(x, (int, float))).all().all()
 
 
-########################################################################################################################
+#############################################################################################################################################################################
 
-# Définir des données de test
-data_to_unique_col = {
-    'temp_1': [25, 30, 35, 40],
-    'temp_2': [20, 25, 30, 35],
-    'ec_1': [5, 10, 15, 20]
-}
-df_to_unique_col = pd.DataFrame(data_to_unique_col)
-
+### Test of 'to_unique_col'
 
 def test_to_unique_col():
+    # Define test data
+    data_to_unique_col = {
+        'temp_1': [25, 30, 35, 40],
+        'temp_2': [20, 25, 30, 35],
+        'ec_1': [5, 10, 15, 20]
+    }
+    df_to_unique_col = pd.DataFrame(data_to_unique_col)
+    
     processed_df = to_unique_col(df_to_unique_col)
 
-    # Vérifier que les colonnes originales ont été supprimées
+    # Check that original columns are deleted
+
     assert 'temp_1' not in processed_df.columns
     assert 'temp_2' not in processed_df.columns
     assert 'ec_1' not in processed_df.columns
 
-    # Vérifier que les nouvelles colonnes sont correctement créées
+    # Check that new columns are created
     assert 'temp_sea' in processed_df.columns
     assert 'ec_sea' in processed_df.columns
     assert 'depth' in processed_df.columns
 
-    # Vérifier si les valeurs ont été correctement concaténées en listes
+    # Check that values are correctly concatenated in lists
     assert processed_df['temp_sea'].tolist() == [[25, 20], [30, 25], [35, 30], [40, 35]]
     assert processed_df['ec_sea'].tolist() == [[5], [10], [15], [20]]
-    assert processed_df['depth'].tolist() == [[], [], [], []]
+    assert processed_df['depth'].tolist() == [[], [], [], []] # Check that a column depth made of empty lists is created when no depth column are in the original file
+
+#############################################################################################################################################################################
+
+def test_salinity_calculator_cas_normal():
+    """
+    On teste avec des valeurs normales et on s'assure que le résultat est correct (compléter les valeurs)
+    """
+    data = [
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 13.500,
+         'conductivity': 38500,
+         'resultat': 66076698.95429349},
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 5.345,
+         'conductivity': 38500,
+         'resultat': 116613280.47066434},
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 13.500,
+         'conductivity': 45555,
+         'resultat': 101284981.33029039},
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 5.345,
+         'conductivity': 45555,
+         'resultat': 178694226.6800965}
+    ]
+    
+    for test_case in data:
+        coeffs = test_case['coeffs']
+        temperature = test_case['temperature']
+        conductivity = test_case['conductivity']
+        resultat = test_case['resultat']
+        
+        salinity = salinity_calculator(temperature, conductivity, coeffs)
+        assert salinity == resultat, 'Le résultat est faux pour un cas classique'
+
+    
+def test_salinity_calculator_cas_limite():
+    """
+    On teste avec des valeurs limites et nulles de température et on s'assure que le résultat est correct
+    """
+    data = [
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': -20,
+         'conductivity': 38500,
+         'resultat': 1455642842.2176728},
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 100,
+         'conductivity': 38500,
+         'resultat': 2600744.709900622},
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 0,
+         'conductivity': 38500,
+         'resultat': 177818660.56553715}
+    ]
+    
+    
+    for test_case in data:
+        coeffs = test_case['coeffs']
+        temperature = test_case['temperature']
+        conductivity = test_case['conductivity']
+        resultat = test_case['resultat']
+
+        salinity = salinity_calculator(temperature, conductivity, coeffs)
+        assert salinity == resultat, 'Le résultat est faux pour un cas limite'
+        
+
+def test_salinity_calculator_conductivity_null():
+    """
+    On teste avec une valeur de conductivité nulle
+    """
+    data = [
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 20,
+         'conductivity': 0,
+         'resultat': 0.010312673450508788}
+    ]
+    
+    for test_case in data:
+        coeffs = test_case['coeffs']
+        temperature = test_case['temperature']
+        conductivity = test_case['conductivity']
+        resultat = test_case['resultat']
+
+        salinity = salinity_calculator(temperature, conductivity, coeffs)
+        assert salinity == resultat, 'Le résultat est faux pour le cas de conductivité nulle'
 
 
-# def drop_null_columns(data): 
-#     """
-#     Drop columns with Nan data to avoid to drop the whole Dataset if there are empty columns
-#     """
-#     isnull = data.isnull().values.all(axis=0)
-#     names_columns_to_drop = []
-#     for i in range(len(isnull)):
-#         if isnull[i] == True : 
-#             names_columns_to_drop.append(data.columns[i])
-#     for k in names_columns_to_drop : 
-#         data.drop([k], axis=1, inplace=True)
+# Test for rename_columns()
+def test_rename_columns():
+    data = {
+        'Lat1': [1.0, 2.0, 3.0],
+        'Lng2': [4.0, 5.0, 6.0],
+        'Date3': ['2022-01-01', '2022-01-02', '2022-01-03'],
+        'Bat %4': [90, 80, 70],
+        'Bat mV5': [4000, 3900, 3800],
+        'Pression_ext6': [1010, 1012, 1015],
+        'Temp_ext7': [25.0, 26.0, 27.0],
+        'Temp_int8': [22.0, 23.0, 24.0],
+        'Temp_sea9': [28.0, 29.0, 30.0],
+        'EC_sea10': [35.0, 36.0, 37.0],
+        'Profondeur11': [10.0, 12.0, 15.0],
+    }
+    df = pd.DataFrame(data)
+    rename_columns(df)
 
-# def temp_pres_filter(df, dict):
-#     """
-#     Filters a df based on columns and related constant values set in a dictionnary
-#     :param df: input DataFrame
-#     :param dict: dictionnary with column names as keys
-#     :return: filtered DataFrame
-#     """
-#     df.reset_index(inplace=True, drop=True)
-#     for name in dict.keys():
-#         df = df[df[name].between(dict[name]["temp_min"], dict[name]["temp_max"])]
-#     return df
+    expected_columns = [
+        "latitude", "longitude", "recorded_at", "battery_percentage",
+        "battery_voltage", "pression_ext", "temp_ext", "temp_int",
+        "temp_sea", "ec_sea", "depth"
+    ]
+    assert df.columns.tolist() == expected_columns
 
-# def salinity_calculator(temperature, conductivity, coeffs):
-#     """
-#     Calculates the salinity
-#     :param temperature: temperature value
-#     :param conductivity: conductivity value
-#     :param coeffs: constant coefficients dictionnary
-#     :return: salinity
-#     """
-#     R_p = 1. # pour les mesures à faible profondeur
-#     r_t = sum([coeffs['C'][i] * temperature**i for i in range(5)])
-#     R_t = conductivity / (42.914 * r_t)
-
-#     return (sum([coeffs['A'][i] * R_t**(int(i)/2.) for i in range(6)])
-#                 + (((temperature - 15)/(1 + coeffs["K"] * (temperature - 15)))
-#                     * (sum([coeffs['B'][i] * R_t**(int(i)/2.) for i in range(6)]))))
