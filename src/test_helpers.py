@@ -7,7 +7,7 @@ You will find here unitary tests for helpers functions
 
 import pandas as pd
 import numpy as np
-from helpers import drop_invalid_datetime, to_numeric, trim_all_columns, drop_null_columns, process_columns, to_unique_col, temp_pres_filter, salinity_calculator, rename_columns
+from tools import treatments_tools as treat
 
 #############################################################################################################################################################################
 
@@ -41,7 +41,7 @@ def test_drop_invalid_datetime():
                     '13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ',
                     ' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ']
     } 
-    df = drop_invalid_datetime(pd.DataFrame(data))
+    df = treat.drop_invalid_datetime(pd.DataFrame(data))
 
 
     assert pd.to_datetime('20/01/01', format='%y/%m/%d').date() in df["Date"].values, "La fonction enlève des dates valides"
@@ -88,7 +88,7 @@ def test_to_numeric():
     }
 
     df = pd.DataFrame(data)
-    df = to_numeric(df,['ec_1','ec_2'])
+    df = treat.to_numeric(df,['ec_1','ec_2'])
 
     assert all(value in df['ec_1'].values for value in [0.0,10.2,12,8.4]), "La fonction enlève des valeurs valides"
     assert df['ec_1'].isin([np.pi]).any(), "la fonction enlève des valeurs complexes (comme np.pi)"
@@ -109,7 +109,7 @@ def test_trim_all_columns():
     }
     df = pd.DataFrame(data)
     df_unchanged = df.copy()
-    df_changed = trim_all_columns(df)
+    df_changed = treat.trim_all_columns(df)
 
     try:
         A = df_changed['A']
@@ -144,8 +144,8 @@ def test_drop_null_columns():
     df1_changed = df1.copy()
     df2 = pd.DataFrame(data2)
     df2_changed = df2.copy()
-    drop_null_columns(df1_changed)
-    drop_null_columns(df2_changed)
+    treat.drop_null_columns(df1_changed)
+    treat.drop_null_columns(df2_changed)
 
     assert df1.equals(df1_changed), "La fonction enlève des colonnes comportant des données"
     assert df1.equals(df2_changed), "la fonction n'enlève pas les colonnes "
@@ -206,7 +206,7 @@ def test_temp_pres_filter():
     dict = {'temperature': {'temp_min': 20, 'temp_max': 30},
             'pressure': {'temp_min': 980, 'temp_max': 1000}}
 
-    filtered_df = temp_pres_filter(df, dict)
+    filtered_df = treat.temp_pres_filter(df, dict)
     filtered_df.reset_index(drop=True, inplace=True)
 
     # compare the result with expected results
@@ -242,7 +242,7 @@ def test_process_columns():
     ec_min = 5
     ec_max = 20
 
-    processed_df, temp_cols, ec_cols, pres_cols = process_columns(df, temp_min, temp_max, temp_ext_min, temp_ext_max, pres_min, pres_max, ec_min, ec_max)
+    processed_df, temp_cols, ec_cols, pres_cols = treat.process_columns(df, temp_min, temp_max, temp_ext_min, temp_ext_max, pres_min, pres_max, ec_min, ec_max)
 
     # Assertions
     assert processed_df.shape[1] == 6  # Check number of columns
@@ -268,7 +268,7 @@ def test_to_unique_col():
     }
     df_to_unique_col = pd.DataFrame(data_to_unique_col)
 
-    processed_df = to_unique_col(df_to_unique_col)
+    processed_df = treat.to_unique_col(df_to_unique_col)
 
     # Check that original columns are deleted
     assert 'temp_1' not in processed_df.columns
@@ -328,7 +328,7 @@ def test_salinity_calculator_cas_normal():
         conductivity = test_case['conductivity']
         resultat = test_case['resultat']
         
-        salinity = salinity_calculator(temperature, conductivity, coeffs)
+        salinity = treat.salinity_calculator(temperature, conductivity, coeffs)
         assert salinity == resultat, 'Le résultat est faux pour un cas classique'
 
     
@@ -367,7 +367,7 @@ def test_salinity_calculator_cas_limite():
         conductivity = test_case['conductivity']
         resultat = test_case['resultat']
 
-        salinity = salinity_calculator(temperature, conductivity, coeffs)
+        salinity = treat.salinity_calculator(temperature, conductivity, coeffs)
         assert salinity == resultat, 'Le résultat est faux pour un cas limite'
         
 
@@ -391,7 +391,7 @@ def test_salinity_calculator_conductivity_null():
         conductivity = test_case['conductivity']
         resultat = test_case['resultat']
 
-        salinity = salinity_calculator(temperature, conductivity, coeffs)
+        salinity = treat.salinity_calculator(temperature, conductivity, coeffs)
         assert salinity == resultat, 'Le résultat est faux pour le cas de conductivité nulle'
 
 
@@ -411,7 +411,7 @@ def test_rename_columns():
         'Profondeur11': [10.0, 12.0, 15.0],
     }
     df = pd.DataFrame(data)
-    rename_columns(df)
+    treat.rename_columns(df)
 
     expected_columns = [
         "latitude", "longitude", "recorded_at", "battery_percentage",
