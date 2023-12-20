@@ -9,14 +9,15 @@ from dotenv import load_dotenv
 from tools import mongoDB_tools as DB_tools
 from main import run
 import pymongo
+import io
 
 DEFAULT_PORT = "8080"
 
 
 app = Flask(__name__)
 
-def s3_create():
-  s3 = boto3.resource('s3',
+def connect_to_s3():
+  s3 = boto3.client('s3',
                      endpoint_url = os.environ['SCW_ENDPOINT'],
                      config = boto3.session.Config(signature_version = 's3v4'),
                      aws_access_key_id = os.environ['SCW_ACCESS_KEY_ID'],
@@ -46,11 +47,12 @@ def root(file_id):
   print(resultat.modified_count)
 
   #insertion de lecture et traitement du dataset
-  s3 = s3_create()
+  s3 = connect_to_s3()
   Key= "sensor/" + information["sensor_id"]+"/"+file_id+".csv"
-  files = s3.Bucket('astrolabe-expeditions-data').Object(key=Key)
-  response=files.get()
-  dataset = run(response['Body'].read())
+  response = s3.get_object(Bucket='astrolabe-expeditions-data', Key = Key)
+  content = response['Body'].read().decode('utf-8')
+  data = pd.read_csv(io.StringIO(content))
+  dataset = run(data)
 
   #insertion des colonnes manquantes dans le dataset
   dataset["sensor_id"]=information["sensor_id"]
