@@ -97,6 +97,10 @@ def test_to_numeric():
     assert not np.isnan(df['ec_2'][0]), "la fonction renvoie np.nan pour des valeurs normalement transformées en numérique"
     assert list(df['str']) == data['str'], "la fonction traite des colonnes qu'elle ne devrait pas traiter"
 
+#############################################################################################################################################################################
+
+### Test of 'trim_all_columns'
+
 def test_trim_all_columns():
     data = {
         'A ' : [4     , 8   , 10.4 , 'oui'],
@@ -120,6 +124,10 @@ def test_trim_all_columns():
     assert df_changed['B'].isin(['r']).any(), "the function doesn't trim spaces around values"
     assert df_changed['B'].isin(['']).any(), "the function doesn't trim empty strings"
 
+#############################################################################################################################################################################
+
+### Test of 'drop_null_columns'
+
 def test_drop_null_columns():
     data1 = {
         'A' : [0, 1, 2, 3],
@@ -142,6 +150,10 @@ def test_drop_null_columns():
     assert df1.equals(df1_changed), "La fonction enlève des colonnes comportant des données"
     assert df1.equals(df2_changed), "la fonction n'enlève pas les colonnes "
 
+#############################################################################################################################################################################
+
+### test of 'temp_pres_filer'
+
 def test_temp_pres_filter():
     # data example
     data = {'temperature': [25, 30, 18, 22, 35],
@@ -163,28 +175,29 @@ def test_temp_pres_filter():
 
 ### Test of 'process_columns'
 
-data = {
+# Unitary test function
+def test_process_columns():
+    data = {
     'Temp_1': [25, 30, 35, None, 45],  # Add a null value for testing
     'Temp_2': [20, 25, 30, 35, 40],
     'Pres_1': [1000, 1010, 1020, 1030, 1040],
     'Pres_2': [990, None, 1010, 1020, 1030],  #Add a null value for testing
     'EC_1': [5, 10, 15, 20, 25],
     'EC_2': [8, 12, 16, 'invalid', 24]  # Add not numerical value for testing
-}
-df = pd.DataFrame(data)
-
-# Define values for filters
-temp_min = 25
-temp_max = 40
-temp_ext_min = 20
-temp_ext_max = 45
-pres_min = 1000
-pres_max = 1030
-ec_min = 5
-ec_max = 20
-
-# Unitary test function
-def test_process_columns():
+    }
+    
+    df = pd.DataFrame(data)
+    
+    # Define values for filters
+    temp_min = 25
+    temp_max = 40
+    temp_ext_min = 20
+    temp_ext_max = 45
+    pres_min = 1000
+    pres_max = 1030
+    ec_min = 5
+    ec_max = 20
+    
     processed_df, temp_cols, ec_cols, pres_cols = process_columns(df, temp_min, temp_max, temp_ext_min, temp_ext_max, pres_min, pres_max, ec_min, ec_max)
 
     # Assertions
@@ -202,15 +215,15 @@ def test_process_columns():
 
 ### Test of 'to_unique_col'
 
-# Define test data
-data_to_unique_col = {
-    'temp_1': [25, 30, 35, 40],
-    'temp_2': [20, 25, 30, 35],
-    'ec_1': [5, 10, 15, 20]
-}
-df_to_unique_col = pd.DataFrame(data_to_unique_col)
-
 def test_to_unique_col():
+    # Define test data
+    data_to_unique_col = {
+        'temp_1': [25, 30, 35, 40],
+        'temp_2': [20, 25, 30, 35],
+        'ec_1': [5, 10, 15, 20]
+    }
+    df_to_unique_col = pd.DataFrame(data_to_unique_col)
+    
     processed_df = to_unique_col(df_to_unique_col)
 
     # Check that original columns are deleted
