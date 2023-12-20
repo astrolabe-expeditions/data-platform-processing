@@ -54,7 +54,7 @@ def root(file_id):
 
   #insertion des colonnes manquantes dans le dataset
   dataset["sensor_id"]=information["sensor_id"]
-  dataset["id"] = [file_id for i in range(len(dataset))]
+  dataset["id"] = file_id
     
   #connexion à la collection records de mongoDB
   records=db.records
