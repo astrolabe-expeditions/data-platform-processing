@@ -243,7 +243,112 @@ def test_to_unique_col():
 
 #############################################################################################################################################################################
 
+def test_salinity_calculator_cas_normal():
+    """
+    On teste avec des valeurs normales et on s'assure que le résultat est correct (compléter les valeurs)
+    """
+    data = [
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 13.500,
+         'conductivity': 38500,
+         'resultat': 66076698.95429349},
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 5.345,
+         'conductivity': 38500,
+         'resultat': 116613280.47066434},
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 13.500,
+         'conductivity': 45555,
+         'resultat': 101284981.33029039},
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 5.345,
+         'conductivity': 45555,
+         'resultat': 178694226.6800965}
+    ]
+    
+    for test_case in data:
+        coeffs = test_case['coeffs']
+        temperature = test_case['temperature']
+        conductivity = test_case['conductivity']
+        resultat = test_case['resultat']
+        
+        salinity = salinity_calculator(temperature, conductivity, coeffs)
+        assert salinity == resultat, 'Le résultat est faux pour un cas classique'
 
+    
+def test_salinity_calculator_cas_limite():
+    """
+    On teste avec des valeurs limites et nulles de température et on s'assure que le résultat est correct
+    """
+    data = [
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': -20,
+         'conductivity': 38500,
+         'resultat': 1455642842.2176728},
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 100,
+         'conductivity': 38500,
+         'resultat': 2600744.709900622},
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 0,
+         'conductivity': 38500,
+         'resultat': 177818660.56553715}
+    ]
+    
+    
+    for test_case in data:
+        coeffs = test_case['coeffs']
+        temperature = test_case['temperature']
+        conductivity = test_case['conductivity']
+        resultat = test_case['resultat']
+
+        salinity = salinity_calculator(temperature, conductivity, coeffs)
+        assert salinity == resultat, 'Le résultat est faux pour un cas limite'
+        
+
+def test_salinity_calculator_conductivity_null():
+    """
+    On teste avec une valeur de conductivité nulle
+    """
+    data = [
+        {'coeffs': {'A': [0.0080, -0.1692, 25.3851, 14.0941, -7.0261, 2.7081],
+                    'B': [0.0005, -0.0056, -0.0066, -0.0375, 0.0636, -0.0144],
+                    'C': [0.6766097, 0.0200564, 0.000110426, -6.9698E-07, 1.0031E-09],
+                    'K': 0.0162},
+         'temperature': 20,
+         'conductivity': 0,
+         'resultat': 0.010312673450508788}
+    ]
+    
+    for test_case in data:
+        coeffs = test_case['coeffs']
+        temperature = test_case['temperature']
+        conductivity = test_case['conductivity']
+        resultat = test_case['resultat']
+
+        salinity = salinity_calculator(temperature, conductivity, coeffs)
+        assert salinity == resultat, 'Le résultat est faux pour le cas de conductivité nulle'
 
 
 
