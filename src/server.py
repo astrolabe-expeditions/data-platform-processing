@@ -30,7 +30,7 @@ def root(file_id):
   load_dotenv() # load environment variables from .env file
 
   myclient = pymongo.MongoClient(os.environ['MONGO_URI'])
-  db = myclient["Astrolabe"]
+  db = myclient[os.environ['MONGO_DATABASE']]
 
   #connexion à la collection files de mongoDB
   files = db.files
@@ -49,7 +49,7 @@ def root(file_id):
   #insertion de lecture et traitement du dataset
   s3 = connect_to_s3()
   Key= "sensor/" + information["sensor_id"]+"/"+file_id+".csv"
-  response = s3.get_object(Bucket='astrolabe-expeditions-data', Key = Key)
+  response = s3.get_object(Bucket=os.environ['SCW_BUCKET'], Key = Key)
   content = response['Body'].read().decode('utf-8')
   data = pd.read_csv(io.StringIO(content))
   dataset = run(data)
@@ -57,10 +57,10 @@ def root(file_id):
   #insertion des colonnes manquantes dans le dataset
   dataset["sensor_id"]=information["sensor_id"]
   dataset["id"] = file_id
-    
+
   #connexion à la collection records de mongoDB
   records=db.records
-    
+
   #Insertion des données dans la BDD mongoDB
   records.insert_many(dataset)
 
@@ -70,7 +70,7 @@ def root(file_id):
 
   #fermeture du lien avec la BDD
   myclient.close()
-  
+
 
 
 if __name__ == "__main__":
