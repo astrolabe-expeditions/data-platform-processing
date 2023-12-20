@@ -3,9 +3,15 @@
 You will find here unitary tests for helpers functions
 """
 
+#############################################################################################################################################################################
+
 import pandas as pd
 import numpy as np
-from helpers import drop_invalid_datetime,to_numeric,trim_all_columns,drop_null_columns
+from helpers import drop_invalid_datetime, to_numeric, trim_all_columns, drop_null_columns, process_columns, to_unique_col
+
+#############################################################################################################################################################################
+
+### Test of 'drop_invalid_datetime'
 
 def test_drop_invalid_datetime():
     ''' 
@@ -64,6 +70,10 @@ def test_drop_invalid_datetime():
     assert pd.to_datetime('20/02/02', format='%y/%m/%d').date() in df["Date"].values, "les dates avec un espace avant sont supprimés et non modifiées"
     assert pd.to_datetime('20/02/03', format='%y/%m/%d').date() in df["Date"].values, "les dates avec un espace après sont supprimés et non modifiées"
     assert pd.to_datetime('20/02/04', format='%y/%m/%d').date() in df["Date"].values, "les dates avec un espace avant et après sont supprimés et non modifiées"
+
+#############################################################################################################################################################################
+
+### Test of 'to_numeric'
 
 def test_to_numeric():
     """
@@ -147,6 +157,85 @@ def test_temp_pres_filter():
     expected_data = {'temperature': [25, 22], 'pressure': [1000, 980]}
     expected_df = pd.DataFrame(expected_data)
     pd.testing.assert_frame_equal(filtered_df, expected_df)
+
+
+#############################################################################################################################################################################
+
+### Test of 'process_columns'
+
+data = {
+    'Temp_1': [25, 30, 35, None, 45],  # Add a null value for testing
+    'Temp_2': [20, 25, 30, 35, 40],
+    'Pres_1': [1000, 1010, 1020, 1030, 1040],
+    'Pres_2': [990, None, 1010, 1020, 1030],  #Add a null value for testing
+    'EC_1': [5, 10, 15, 20, 25],
+    'EC_2': [8, 12, 16, 'invalid', 24]  # Add not numerical value for testing
+}
+df = pd.DataFrame(data)
+
+# Define values for filters
+temp_min = 25
+temp_max = 40
+temp_ext_min = 20
+temp_ext_max = 45
+pres_min = 1000
+pres_max = 1030
+ec_min = 5
+ec_max = 20
+
+# Unitary test function
+def test_process_columns():
+    processed_df, temp_cols, ec_cols, pres_cols = process_columns(df, temp_min, temp_max, temp_ext_min, temp_ext_max, pres_min, pres_max, ec_min, ec_max)
+
+    # Assertions
+    assert processed_df.shape[1] == 6  # Check number of columns
+    assert 'Temp_1' in temp_cols  # Check if Temp_1 is in the temp_cols list
+    assert 'EC_1' in ec_cols  # Check if EC_1 is in ec_cols list
+    assert 'Pres_1' in pres_cols  # Check if Pres_1 is in ec_cols list
+    assert processed_df['Temp_1'].notnull().all()  # Check that there is no null value in Temp_1 column in the final df
+    assert processed_df['Pres_2'].notnull().all()  # Check that there is no null value in Pres_2 column in the final df
+    assert processed_df['EC_2'].apply(pd.to_numeric, errors='coerce').notnull().all()  # Check that all EC_2 values are numeric
+    assert processed_df.applymap(lambda x: isinstance(x, (int, float))).all().all()
+
+
+#############################################################################################################################################################################
+
+### Test of 'to_unique_col'
+
+# Define test data
+data_to_unique_col = {
+    'temp_1': [25, 30, 35, 40],
+    'temp_2': [20, 25, 30, 35],
+    'ec_1': [5, 10, 15, 20]
+}
+df_to_unique_col = pd.DataFrame(data_to_unique_col)
+
+def test_to_unique_col():
+    processed_df = to_unique_col(df_to_unique_col)
+
+    # Check that original columns are deleted
+    assert 'temp_1' not in processed_df.columns
+    assert 'temp_2' not in processed_df.columns
+    assert 'ec_1' not in processed_df.columns
+
+    # Check that new columns are created
+    assert 'temp_sea' in processed_df.columns
+    assert 'ec_sea' in processed_df.columns
+    assert 'depth' in processed_df.columns
+
+    # Check that values are correctly concatenated in lists
+    assert processed_df['temp_sea'].tolist() == [[25, 20], [30, 25], [35, 30], [40, 35]]
+    assert processed_df['ec_sea'].tolist() == [[5], [10], [15], [20]]
+    assert processed_df['depth'].tolist() == [[], [], [], []] # Check that a column depth made of empty lists is created when no depth column are in the original file
+
+#############################################################################################################################################################################
+
+
+
+
+
+
+
 
 
 # def drop_null_columns(data): 
