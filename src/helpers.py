@@ -4,6 +4,7 @@ You will find here intermediary/helper functions that are used in the main scrip
 """
 
 import pandas as pd
+import numpy as np
 
 def drop_invalid_datetime(df):
     """
@@ -81,4 +82,39 @@ def salinity_calculator(temperature, conductivity, coeffs):
     return (sum([coeffs['A'][i] * R_t**(int(i)/2.) for i in range(6)])
                 + (((temperature - 15)/(1 + coeffs["K"] * (temperature - 15)))
                     * (sum([coeffs['B'][i] * R_t**(int(i)/2.) for i in range(6)]))))
+
+
+def gc_interpolate(lat1, lng1, lat2, lng2, n):
+    """ Great circle interpolation
+    
+    @param lat1, lng1: latitude, longitude of the point 1, in demical degrees
+    @param lat2, lng2: latitude, longitude of the point 2, in demical degrees
+    @param n: number of points to be interpolated 
+    
+    @return points: points to be interpolated
+    """
+    
+    # demical degrees to radians
+    lat1 = np.deg2rad(lat1)
+    lng1 = np.deg2rad(lng1)
+    lat2 = np.deg2rad(lat2)
+    lng2 = np.deg2rad(lng2)
+    
+    a = np.square(np.sin((lat2 - lat1) / 2)) + np.cos(lat1) * np.cos(lat2) * np.square(np.sin((lng2 - lng1) / 2))
+    d = 2 * np.arcsin(np.sqrt(a))
+    
+    points = []
+    for i in range(1, n + 1):
+        f = 1.0 / (n + 1)
+        A = np.sin((1 - f) * d) / np.sin(d)
+        B = np.sin(f * d) / np.sin(d)
+        x = A * np.cos(lat1) * np.cos(lng1) + B * np.cos(lat2) * np.cos(lng2)
+        y = A * np.cos(lat1) * np.sin(lng1) + B * np.cos(lat2) * np.sin(lng2)
+        z = A * np.sin(lat1) + B * np.sin(lat2)
+        lat3 = np.arctan2(z, np.sqrt(x * x + y * y))
+        lng3 = np.arctan2(y, x)
+        
+        points.append([np.round(np.rad2deg(lat3), 6), np.round(np.rad2deg(lng3), 6)])
+        
+    return points
 
