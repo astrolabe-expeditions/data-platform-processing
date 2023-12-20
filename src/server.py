@@ -29,7 +29,9 @@ def connect_to_s3():
 def root(file_id):
   load_dotenv() # load environment variables from .env file
 
-  myclient = pymongo.MongoClient('mongodb+srv://daullethomas631:Thomas2002@cluster0.chgct4d.mongodb.net/?retryWrites=true&w=majority')
+  user=os.environ['MONGODB_ACCES_KEY']
+  password=os.environ['MONGODB_PASSWORD']
+  myclient = pymongo.MongoClient('mongodb+srv://'+user+':'+password+':@cluster0.chgct4d.mongodb.net/?retryWrites=true&w=majority')
   db = myclient["Astrolabe"]
 
   #connexion à la collection files de mongoDB
