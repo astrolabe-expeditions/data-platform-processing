@@ -10,3 +10,7 @@ tzdata==2023.3
 pytest==7.4.2
 Flask
 io
+boto3
+python-dotenv
+pymongo
+bson
