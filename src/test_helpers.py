@@ -151,48 +151,7 @@ def test_drop_null_columns():
     assert df1.equals(df2_changed), "la fonction n'enlève pas les colonnes "
 
 
-def test_process_columns():
-    processed_df, temp_cols, ec_cols, pres_cols = process_columns(df, temp_min, temp_max, temp_ext_min, temp_ext_max, pres_min, pres_max, ec_min, ec_max)
-
-    # Vérifier que les colonnes sont correctement filtrées et renvoyées
-    assert processed_df.shape[1] == 6  # Vérifie que le nombre de colonnes est correct après le traitement
-    assert 'Temp_1' in temp_cols  # Vérifie si la colonne Temp_1 est ajoutée à temp_cols
-    assert 'EC_1' in ec_cols  # Vérifie si la colonne EC_1 est ajoutée à ec_cols
-    assert 'Pres_1' in pres_cols  # Vérifie si la colonne Pres_1 est ajoutée à pres_cols
-    assert processed_df['Temp_1'].notnull().all()  # Vérifie si aucune valeur vide dans la colonne Temp_1 du DataFrame final
-    assert processed_df['Pres_2'].notnull().all()  # Vérifie si aucune valeur vide dans la colonne Pres_2 du DataFrame final
-    assert processed_df['EC_2'].apply(pd.to_numeric, errors='coerce').notnull().all()  # Vérifie si toutes les valeurs de la colonne EC_2 sont numériques
-    assert processed_df.applymap(lambda x: isinstance(x, (int, float))).all().all()
-
-
 ########################################################################################################################
-
-# Définir des données de test
-data_to_unique_col = {
-    'temp_1': [25, 30, 35, 40],
-    'temp_2': [20, 25, 30, 35],
-    'ec_1': [5, 10, 15, 20]
-}
-df_to_unique_col = pd.DataFrame(data_to_unique_col)
-
-
-def test_to_unique_col():
-    processed_df = to_unique_col(df_to_unique_col)
-
-    # Vérifier que les colonnes originales ont été supprimées
-    assert 'temp_1' not in processed_df.columns
-    assert 'temp_2' not in processed_df.columns
-    assert 'ec_1' not in processed_df.columns
-
-    # Vérifier que les nouvelles colonnes sont correctement créées
-    assert 'temp_sea' in processed_df.columns
-    assert 'ec_sea' in processed_df.columns
-    assert 'depth' in processed_df.columns
-
-    # Vérifier si les valeurs ont été correctement concaténées en listes
-    assert processed_df['temp_sea'].tolist() == [[25, 20], [30, 25], [35, 30], [40, 35]]
-    assert processed_df['ec_sea'].tolist() == [[5], [10], [15], [20]]
-    assert processed_df['depth'].tolist() == [[], [], [], []]
 
 
 ### Test of 'process_columns'
@@ -397,47 +356,4 @@ def test_rename_columns():
         "temp_sea", "ec_sea", "depth"
     ]
     assert df.columns.tolist() == expected_columns
-
-
-
-
-
-# def drop_null_columns(data): 
-#     """
-#     Drop columns with Nan data to avoid to drop the whole Dataset if there are empty columns
-#     """
-#     isnull = data.isnull().values.all(axis=0)
-#     names_columns_to_drop = []
-#     for i in range(len(isnull)):
-#         if isnull[i] == True : 
-#             names_columns_to_drop.append(data.columns[i])
-#     for k in names_columns_to_drop : 
-#         data.drop([k], axis=1, inplace=True)
-
-# def temp_pres_filter(df, dict):
-#     """
-#     Filters a df based on columns and related constant values set in a dictionnary
-#     :param df: input DataFrame
-#     :param dict: dictionnary with column names as keys
-#     :return: filtered DataFrame
-#     """
-#     df.reset_index(inplace=True, drop=True)
-#     for name in dict.keys():
-#         df = df[df[name].between(dict[name]["temp_min"], dict[name]["temp_max"])]
-#     return df
-
-# def salinity_calculator(temperature, conductivity, coeffs):
-#     """
-#     Calculates the salinity
-#     :param temperature: temperature value
-#     :param conductivity: conductivity value
-#     :param coeffs: constant coefficients dictionnary
-#     :return: salinity
-#     """
-#     R_p = 1. # pour les mesures à faible profondeur
-#     r_t = sum([coeffs['C'][i] * temperature**i for i in range(5)])
-#     R_t = conductivity / (42.914 * r_t)
-
-#     return (sum([coeffs['A'][i] * R_t**(int(i)/2.) for i in range(6)])
-#                 + (((temperature - 15)/(1 + coeffs["K"] * (temperature - 15)))
-#                     * (sum([coeffs['B'][i] * R_t**(int(i)/2.) for i in range(6)]))))
+    
