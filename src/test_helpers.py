@@ -7,7 +7,7 @@ You will find here unitary tests for helpers functions
 
 import pandas as pd
 import numpy as np
-from helpers import drop_invalid_datetime, to_numeric, trim_all_columns, drop_null_columns, process_columns, to_unique_col, temp_pres_filter
+from helpers import drop_invalid_datetime, to_numeric, trim_all_columns, drop_null_columns, process_columns, to_unique_col, temp_pres_filter, salinity_calculator, rename_columns
 
 #############################################################################################################################################################################
 
