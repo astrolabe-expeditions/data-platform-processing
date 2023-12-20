@@ -11,7 +11,8 @@ def run(data):
     return: DataFrame with adequate data treatment done
     """
     ### 1/ Read data => trim column names and drop empty columns
-    data = treat.trim_all_columns(data)
+
+    data = trim_all_columns(data)
 
     ### 2/ We replace all empty strings by NaN
     data.replace('',np.nan,regex = True, inplace=True)
