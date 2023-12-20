@@ -5,13 +5,12 @@ from helpers import temp_pres_ec_filter, salinity_calculator, drop_invalid_datet
 from constants import coeffs_salinite, temp_min_value, temp_max_value, temp_ext_min_value, temp_ext_max_value, pres_min_value, pres_max_value, ec_min_value, ec_max_value
 
 
-def run():
+def run(data):
     """
     Main function to execute.
     return: DataFrame with adequate data treatment done
     """
     ### 1/ Read data => trim column names and drop empty columns
-    data = pd.read_csv(r'C:\Users\kamel\Desktop\IMT Atlantique\A2\Commande Entreprise\combine2.csv', delimiter=';')
     data = trim_all_columns(data)
 
     ### 2/ We replace all empty strings by NaN
@@ -59,5 +58,3 @@ def run():
 
     return data
 
-if __name__ == "__main__":
-    run()
