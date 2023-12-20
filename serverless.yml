@@ -37,7 +37,7 @@ custom:
         - name: MONGO_URI
           value: ${env:MONGO_URI}
         - name: MONGO_DATABASE
-          value: ${env:MONGO_DATABASE
+          value: ${env:MONGO_DATABASE}
         - name: SCW_BUCKET
           value: ${env:SCW_BUCKET}
         - name: SCW_ACCESS_KEY_ID
