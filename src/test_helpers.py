@@ -351,6 +351,30 @@ def test_salinity_calculator_conductivity_null():
         assert salinity == resultat, 'Le résultat est faux pour le cas de conductivité nulle'
 
 
+# Test for rename_columns()
+def test_rename_columns():
+    data = {
+        'Lat1': [1.0, 2.0, 3.0],
+        'Lng2': [4.0, 5.0, 6.0],
+        'Date3': ['2022-01-01', '2022-01-02', '2022-01-03'],
+        'Bat %4': [90, 80, 70],
+        'Bat mV5': [4000, 3900, 3800],
+        'Pression_ext6': [1010, 1012, 1015],
+        'Temp_ext7': [25.0, 26.0, 27.0],
+        'Temp_int8': [22.0, 23.0, 24.0],
+        'Temp_sea9': [28.0, 29.0, 30.0],
+        'EC_sea10': [35.0, 36.0, 37.0],
+        'Profondeur11': [10.0, 12.0, 15.0],
+    }
+    df = pd.DataFrame(data)
+    rename_columns(df)
+
+    expected_columns = [
+        "latitude", "longitude", "recorded_at", "battery_percentage",
+        "battery_voltage", "pression_ext", "temp_ext", "temp_int",
+        "temp_sea", "ec_sea", "depth"
+    ]
+    assert df.columns.tolist() == expected_columns
 
 
 
