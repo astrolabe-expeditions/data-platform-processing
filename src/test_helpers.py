@@ -133,6 +133,48 @@ def test_drop_null_columns():
     assert df1.equals(df2_changed), "la fonction n'enlève pas les colonnes "
 
     
+def test_process_columns():
+    processed_df, temp_cols, ec_cols, pres_cols = process_columns(df, temp_min, temp_max, temp_ext_min, temp_ext_max, pres_min, pres_max, ec_min, ec_max)
+
+    # Vérifier que les colonnes sont correctement filtrées et renvoyées
+    assert processed_df.shape[1] == 6  # Vérifie que le nombre de colonnes est correct après le traitement
+    assert 'Temp_1' in temp_cols  # Vérifie si la colonne Temp_1 est ajoutée à temp_cols
+    assert 'EC_1' in ec_cols  # Vérifie si la colonne EC_1 est ajoutée à ec_cols
+    assert 'Pres_1' in pres_cols  # Vérifie si la colonne Pres_1 est ajoutée à pres_cols
+    assert processed_df['Temp_1'].notnull().all()  # Vérifie si aucune valeur vide dans la colonne Temp_1 du DataFrame final
+    assert processed_df['Pres_2'].notnull().all()  # Vérifie si aucune valeur vide dans la colonne Pres_2 du DataFrame final
+    assert processed_df['EC_2'].apply(pd.to_numeric, errors='coerce').notnull().all()  # Vérifie si toutes les valeurs de la colonne EC_2 sont numériques
+    assert processed_df.applymap(lambda x: isinstance(x, (int, float))).all().all()
+
+
+########################################################################################################################
+
+# Définir des données de test
+data_to_unique_col = {
+    'temp_1': [25, 30, 35, 40],
+    'temp_2': [20, 25, 30, 35],
+    'ec_1': [5, 10, 15, 20]
+}
+df_to_unique_col = pd.DataFrame(data_to_unique_col)
+
+
+def test_to_unique_col():
+    processed_df = to_unique_col(df_to_unique_col)
+
+    # Vérifier que les colonnes originales ont été supprimées
+    assert 'temp_1' not in processed_df.columns
+    assert 'temp_2' not in processed_df.columns
+    assert 'ec_1' not in processed_df.columns
+
+    # Vérifier que les nouvelles colonnes sont correctement créées
+    assert 'temp_sea' in processed_df.columns
+    assert 'ec_sea' in processed_df.columns
+    assert 'depth' in processed_df.columns
+
+    # Vérifier si les valeurs ont été correctement concaténées en listes
+    assert processed_df['temp_sea'].tolist() == [[25, 20], [30, 25], [35, 30], [40, 35]]
+    assert processed_df['ec_sea'].tolist() == [[5], [10], [15], [20]]
+    assert processed_df['depth'].tolist() == [[], [], [], []]
 
 
 # def drop_null_columns(data): 
