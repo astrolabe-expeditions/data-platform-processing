@@ -34,6 +34,43 @@ def to_numeric(df, col_list):
     return df
 
 
+def process_columns(df, temp_min_value, temp_max_value, temp_ext_min_value, temp_ext_max_value, pres_min_value, pres_max_value, ec_min_value, ec_max_value):
+    """
+    :param df: input df
+    :param min_value: min value to filter data
+    :param max_value: max value to filter data
+    :return: processed dataframe; list of temp columns; list of pressure columns; list of EC columns
+    """
+
+    # Lists for columns starting with 'Temp', 'EC', and 'Pres'
+    temp_columns = []
+    ec_columns = []
+    pres_columns = []
+
+    for col in df.columns:
+        # find relevant columns
+        if col.startswith('Temp') or col.startswith('Pres') or col.startswith('EC'):
+            # set adequate format 
+            df[col] = pd.to_numeric(df[col], errors = 'coerce')
+            # filter columns based on col dimension
+            if col.startswith('Temp'):
+                if "ext" in col.lower():
+                    df = df[temp_pres_ec_filter(df[col],temp_ext_min_value,temp_ext_max_value)]
+                else:
+                    df = df[temp_pres_ec_filter(df[col],temp_min_value,temp_max_value)]
+                    temp_columns.append(col)
+            elif col.startswith('Pres'):
+                df = df[temp_pres_ec_filter(df[col], pres_min_value, pres_max_value)]
+                pres_columns.append(col)
+            else:
+                df = df[temp_pres_ec_filter(df[col], ec_min_value,ec_max_value)]
+                ec_columns.append(col)
+            # drop null values and reset index
+            df.dropna(inplace = True)
+            df.reset_index(inplace = True, drop = True)
+    return df, temp_columns, ec_columns, pres_columns
+
+
 def trim_all_columns(df):
     """
     Trim whitespace from ends of each value across all series in dataframe
@@ -54,17 +91,16 @@ def drop_null_columns(data):
     for k in names_columns_to_drop : 
         data.drop([k], axis=1, inplace=True)
 
-def temp_pres_filter(df, dict):
+def temp_pres_ec_filter(col, mini, maxi):
     """
-    Filters a df based on columns and related constant values set in a dictionnary
-    :param df: input DataFrame
-    :param dict: dictionnary with column names as keys
-    :return: filtered DataFrame
+    Filters a column based on min and max values
+    :param col: input column
+    :param mini: float value minimum accepted
+    :param maxi: float value maximum accepted
+    :return: filtered column
     """
-    df.reset_index(inplace=True, drop=True)
-    for name in dict.keys():
-        df = df[df[name].between(dict[name]["temp_min"], dict[name]["temp_max"])]
-    return df
+    col = col.between(mini, maxi)
+    return col
 
 def salinity_calculator(temperature, conductivity, coeffs):
     """
@@ -81,4 +117,67 @@ def salinity_calculator(temperature, conductivity, coeffs):
     return (sum([coeffs['A'][i] * R_t**(int(i)/2.) for i in range(6)])
                 + (((temperature - 15)/(1 + coeffs["K"] * (temperature - 15)))
                     * (sum([coeffs['B'][i] * R_t**(int(i)/2.) for i in range(6)]))))
+
+def to_unique_col(df):
+    """
+    Concatenates temp, ec, depth values to create a single columns made of list
+    temp_sea column will look like:
+         [[temp_sea_1(row_1), temp_sea_2(row_1),...,temp_sea_n(row_1)],..., [temp_sea_1(row_m), temp_sea_2(row_m),...,temp_sea_n(row_m)]
+    :param df:input df with all columns
+    :return: new df
+    """
+    # Identify columns
+    temp_cols = [col for col in df.columns if col.lower().startswith('temp')]
+    ec_cols = [col for col in df.columns if col.lower().startswith('ec')]
+    depth_cols = [col for col in df.columns if col.lower().startswith('depth')]
+
+    # Concatenate values into lists
+    if depth_cols:
+        df["depth"] = df[depth_cols].values.tolist()
+        df.drop(columns=depth_cols, inplace=True)
+    else:
+        df["depth"] = [[] for _ in range(len(df))]
+
+    if temp_cols:
+        df["temp_sea"] = df[temp_cols].values.tolist()
+        df.drop(columns=temp_cols, inplace=True)
+    else:
+        df["temp_sea"] = [[] for _ in range(len(df))]
+
+    if ec_cols:
+        df["ec_sea"] = df[ec_cols].values.tolist()
+        df.drop(columns=ec_cols, inplace=True)
+    else:
+        df["ec_sea"] = [[] for _ in range(len(df))]
+
+    return df
+
+
+def rename_columns(data):
+    for col in data.columns:
+        if col.startswith('Lat') : 
+            data.columns = data.columns.str.replace(col, "latitude")
+        if col.startswith('Lng') : 
+            data.columns = data.columns.str.replace(col, "longitude")
+        if col.startswith('Date') : 
+            data.columns = data.columns.str.replace(col, "recorded_at")
+        if col.startswith('Bat %') : 
+            data.columns = data.columns.str.replace(col, "battery_percentage")
+        if col.startswith('Bat mV') : 
+            data.columns = data.columns.str.replace(col, "battery_voltage")
+        if col.startswith('Pression_ext') : 
+            data.columns = data.columns.str.replace(col, "pression_ext")
+        if col.startswith('Temp_ext') : 
+            data.columns = data.columns.str.replace(col, "temp_ext")
+        if col.startswith('Temp_int') : 
+            data.columns = data.columns.str.replace(col, "temp_int")
+        if col.startswith('Temp_sea') : 
+            data.columns = data.columns.str.replace(col, "temp_sea")
+        if col.startswith('EC_sea') : 
+            data.columns = data.columns.str.replace(col, "ec_sea")
+        if col.startswith('Profondeur') : 
+            data.columns = data.columns.str.replace(col, "depth")
+
+
+
 
