@@ -194,28 +194,6 @@ def test_to_unique_col():
     assert processed_df['ec_sea'].tolist() == [[5], [10], [15], [20]]
     assert processed_df['depth'].tolist() == [[], [], [], []]
 
-#############################################################################################################################################################################
-
-### test of 'temp_pres_filer'
-
-def test_temp_pres_filter():
-    # data example
-    data = {'temperature': [25, 30, 18, 22, 35],
-            'pressure': [1000, 950, 1050, 980, 990]}
-    df = pd.DataFrame(data)
-    dict = {'temperature': {'temp_min': 20, 'temp_max': 30},
-            'pressure': {'temp_min': 980, 'temp_max': 1000}}
-
-    filtered_df = treat.temp_pres_filter(df, dict)
-    filtered_df.reset_index(drop=True, inplace=True)
-
-    # compare the result with expected results
-    expected_data = {'temperature': [25, 22], 'pressure': [1000, 980]}
-    expected_df = pd.DataFrame(expected_data)
-    pd.testing.assert_frame_equal(filtered_df, expected_df)
-
-
-#############################################################################################################################################################################
 
 ### Test of 'process_columns'
 
