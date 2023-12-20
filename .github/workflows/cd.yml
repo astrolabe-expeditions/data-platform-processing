@@ -34,3 +34,10 @@ jobs:
         SCW_PROJECT_ID: ${{ secrets.SCW_PROJECT_ID }}
         SCW_TOKEN: ${{ secrets.SCW_TOKEN }}
         SCW_REGISTRY: ${{ secrets.SCW_REGISTRY }}
+        MONGO_URI: ${{ secrets.MONGO_URI }}
+        MONGO_DATABASE: ${{ vars.MONGO_DATABASE }}
+        SCW_BUCKET: ${{ vars.SCW_BUCKET }}
+        SCW_ACCESS_KEY_ID: ${{ secrets.SCW_ACCESS_KEY_ID }}
+        SCW_SECRET_ACCESS_KEY: ${{ secrets.SCW_SECRET_ACCESS_KEY }}
+        SCW_ENDPOINT: ${{ vars.SCW_ENDPOINT }}
+        SCW_REGION: ${{ vars.SCW_REGION }}
