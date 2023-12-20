@@ -360,6 +360,7 @@ def test_salinity_calculator_cas_limite():
          'resultat': 177818660.56553715}
     ]
     
+    
     for test_case in data:
         coeffs = test_case['coeffs']
         temperature = test_case['temperature']
