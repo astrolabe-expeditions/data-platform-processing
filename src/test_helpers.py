@@ -132,7 +132,21 @@ def test_drop_null_columns():
     assert df1.equals(df1_changed), "La fonction enlève des colonnes comportant des données"
     assert df1.equals(df2_changed), "la fonction n'enlève pas les colonnes "
 
-    
+def test_temp_pres_filter():
+    # data example
+    data = {'temperature': [25, 30, 18, 22, 35],
+            'pressure': [1000, 950, 1050, 980, 990]}
+    df = pd.DataFrame(data)
+    dict = {'temperature': {'temp_min': 20, 'temp_max': 30},
+            'pressure': {'temp_min': 980, 'temp_max': 1000}}
+
+    filtered_df = temp_pres_filter(df, dict)
+    filtered_df.reset_index(drop=True, inplace=True)
+
+    # compare the result with expected results
+    expected_data = {'temperature': [25, 22], 'pressure': [1000, 980]}
+    expected_df = pd.DataFrame(expected_data)
+    pd.testing.assert_frame_equal(filtered_df, expected_df)
 
 
 # def drop_null_columns(data): 
