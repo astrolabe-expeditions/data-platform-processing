@@ -2,7 +2,7 @@ import pymongo
 from bson import ObjectId
 
 def object_file(file_id):
-    id_file=ObjectId("file_id")
+    id_file=ObjectId(file_id)
     return (id_file)
 
 
