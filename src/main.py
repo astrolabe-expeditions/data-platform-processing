@@ -44,17 +44,21 @@ def run(data):
     sal_mean = treat.salinity_calculator(temp_mean, ec_mean / 1000, coeffs_salinite)
 
     ### 8/ Creation of Datetime column (for later vizualisation purposes)
-    data['Datetime'] = pd.to_datetime(data['Date'].astype(str) + ' ' + data['Time'].astype(str), format='%Y-%m-%d %H:%M:%S')
+    data['recorded_at'] = pd.to_datetime(data['Date'].astype(str) + ' ' + data['Time'].astype(str), format='%Y-%m-%d %H:%M:%S')
 
-    ### 9/ Add calculated value to our data
-    data['Temp_mean'] = temp_mean
-    data['Ec_mean'] = ec_mean
-    data['Salinity'] = sal_mean
-
-    ### 10/ Merge temp, ec, and depth columns into one column
+    ### 9/ Merge temp, ec, and depth columns into one column
     data = treat.to_unique_col(data)
 
+    ### 10/ Add calculated value to our data
+    data['temp_sea_mean'] = temp_mean
+    data['ec_sea_mean'] = ec_mean
+    data['salinity'] = sal_mean
+
+    ### 11/ Remaning columns into database format
     treat.rename_columns(data)
+
+    data = data.drop('Date', axis=1)
+    data = data.drop('Time', axis=1)
 
     return data
 
