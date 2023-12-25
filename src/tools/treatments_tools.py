@@ -11,6 +11,8 @@ def drop_invalid_datetime(df):
     :param df: input DataFrame
     :return: df without rows where either date or time is in invalid format
     """
+    print("drop_invalid_datetime")
+
     # a. trim values in columns 'Date' and 'Time'
     df["Date"] = df["Date"].str.strip()
     df["Time"] = df["Time"].str.strip()
@@ -50,10 +52,10 @@ def process_columns(df, temp_min_value, temp_max_value, temp_ext_min_value, temp
     for col in df.columns:
         # find relevant columns
         if col.startswith('Temp') or col.startswith('Pres') or col.startswith('EC'):
-            # set adequate format 
+            # set adequate format
             df[col] = pd.to_numeric(df[col], errors = 'coerce')
             # filter columns based on col dimension
-            if col.startswith('Temp'):
+            if col.startswith('Temp') and "ext" not in col.lower() and "int" not in col.lower():
                 if "ext" in col.lower():
                     df = df[temp_pres_ec_filter(df[col],temp_ext_min_value,temp_ext_max_value)]
                 else:
@@ -79,16 +81,16 @@ def trim_all_columns(df):
     trim_strings = lambda x: x.strip() if isinstance(x, str) else x
     return df.applymap(trim_strings)
 
-def drop_null_columns(data): 
+def drop_null_columns(data):
     """
     Drop columns with Nan data to avoid to drop the whole Dataset if there are empty columns
     """
     isnull = data.isnull().values.all(axis=0)
     names_columns_to_drop = []
     for i in range(len(isnull)):
-        if isnull[i] == True : 
+        if isnull[i] == True :
             names_columns_to_drop.append(data.columns[i])
-    for k in names_columns_to_drop : 
+    for k in names_columns_to_drop :
         data.drop([k], axis=1, inplace=True)
 
 def temp_pres_ec_filter(col, mini, maxi):
@@ -127,7 +129,7 @@ def to_unique_col(df):
     :return: new df
     """
     # Identify columns
-    temp_cols = [col for col in df.columns if col.lower().startswith('temp')]
+    temp_cols = [col for col in df.columns if col.lower().startswith('temp') and "ext" not in col.lower() and "int" not in col.lower()]
     ec_cols = [col for col in df.columns if col.lower().startswith('ec')]
     depth_cols = [col for col in df.columns if col.lower().startswith('depth')]
 
@@ -155,28 +157,27 @@ def to_unique_col(df):
 
 def rename_columns(data):
     for col in data.columns:
-        if col.startswith('Lat') : 
+        if col.startswith('Lat') :
             data.columns = data.columns.str.replace(col, "latitude")
-        if col.startswith('Lng') : 
+        if col.startswith('Lng') :
             data.columns = data.columns.str.replace(col, "longitude")
-        if col.startswith('Date') : 
-            data.columns = data.columns.str.replace(col, "recorded_at")
-        if col.startswith('Bat %') : 
+        if col.startswith('Bat %') :
             data.columns = data.columns.str.replace(col, "battery_percentage")
-        if col.startswith('Bat mV') : 
+        if col.startswith('Bat mV') :
             data.columns = data.columns.str.replace(col, "battery_voltage")
-        if col.startswith('Pression_ext') : 
+        if col.startswith('Pression_ext') :
             data.columns = data.columns.str.replace(col, "pression_ext")
-        if col.startswith('Temp_ext') : 
+        if col.startswith('Temp_ext') :
             data.columns = data.columns.str.replace(col, "temp_ext")
-        if col.startswith('Temp_int') : 
+        if col.startswith('Temp_int') :
             data.columns = data.columns.str.replace(col, "temp_int")
-        if col.startswith('Temp_sea') : 
+        if col.startswith('Temp_sea') :
             data.columns = data.columns.str.replace(col, "temp_sea")
-        if col.startswith('EC_sea') : 
+        if col.startswith('EC_sea') :
             data.columns = data.columns.str.replace(col, "ec_sea")
-        if col.startswith('Profondeur') : 
+        if col.startswith('Profondeur') :
             data.columns = data.columns.str.replace(col, "depth")
+
 
 
 

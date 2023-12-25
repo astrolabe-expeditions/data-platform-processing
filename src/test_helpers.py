@@ -14,8 +14,8 @@ from tools import treatments_tools as treat
 ### Test of 'drop_invalid_datetime'
 
 def test_drop_invalid_datetime():
-    ''' 
-    dataframe: 
+    '''
+    dataframe:
        Dates: date valide, espace, string vide, jour impossible, mois impossible, année impossible, espace avant, espace après, les 2
        Temps: temps valide, espace, string vide, seconde impossible, minute impossible, heure impossible, espace avant, espace après, les 2
     format : année / mois / jour | heure / minute / seconde
@@ -40,7 +40,7 @@ def test_drop_invalid_datetime():
                     ' 13:45:26',' 13:45:26',' 13:45:26',' 13:45:26',' 13:45:26',' 13:45:26',' 13:45:26',' 13:45:26',' 13:45:26',' 13:45:26',
                     '13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ','13:45:27 ',
                     ' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ',' 13:45:28 ']
-    } 
+    }
     df = treat.drop_invalid_datetime(pd.DataFrame(data))
 
 
@@ -77,7 +77,7 @@ def test_drop_invalid_datetime():
 
 def test_to_numeric():
     """
-    tests done: 
+    tests done:
     - tests of expected response
     - tests with other value types
     """
@@ -258,17 +258,16 @@ def test_salinity_calculator_cas_normal():
          'conductivity': 45555,
          'resultat': 178694226.6800965}
     ]
-    
+
     for test_case in data:
         coeffs = test_case['coeffs']
         temperature = test_case['temperature']
         conductivity = test_case['conductivity']
         resultat = test_case['resultat']
-        
         salinity = treat.salinity_calculator(temperature, conductivity, coeffs)
         assert salinity == resultat, 'Le résultat est faux pour un cas classique'
 
-    
+
 def test_salinity_calculator_cas_limite():
     """
     On teste avec des valeurs limites et nulles de température et on s'assure que le résultat est correct
@@ -296,8 +295,7 @@ def test_salinity_calculator_cas_limite():
          'conductivity': 38500,
          'resultat': 177818660.56553715}
     ]
-    
-    
+
     for test_case in data:
         coeffs = test_case['coeffs']
         temperature = test_case['temperature']
@@ -306,7 +304,7 @@ def test_salinity_calculator_cas_limite():
 
         salinity = treat.salinity_calculator(temperature, conductivity, coeffs)
         assert salinity == resultat, 'Le résultat est faux pour un cas limite'
-        
+
 
 def test_salinity_calculator_conductivity_null():
     """
@@ -321,7 +319,7 @@ def test_salinity_calculator_conductivity_null():
          'conductivity': 0,
          'resultat': 0.010312673450508788}
     ]
-    
+
     for test_case in data:
         coeffs = test_case['coeffs']
         temperature = test_case['temperature']
@@ -337,7 +335,6 @@ def test_rename_columns():
     data = {
         'Lat1': [1.0, 2.0, 3.0],
         'Lng2': [4.0, 5.0, 6.0],
-        'Date3': ['2022-01-01', '2022-01-02', '2022-01-03'],
         'Bat %4': [90, 80, 70],
         'Bat mV5': [4000, 3900, 3800],
         'Pression_ext6': [1010, 1012, 1015],
@@ -351,9 +348,8 @@ def test_rename_columns():
     treat.rename_columns(df)
 
     expected_columns = [
-        "latitude", "longitude", "recorded_at", "battery_percentage",
+        "latitude", "longitude", "battery_percentage",
         "battery_voltage", "pression_ext", "temp_ext", "temp_int",
         "temp_sea", "ec_sea", "depth"
     ]
     assert df.columns.tolist() == expected_columns
-    
