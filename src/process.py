@@ -13,10 +13,10 @@ import io
 
 def connect_to_s3():
   s3 = boto3.client('s3',
-    endpoint_url = os.environ['SCW_S3_ENDPOINT'],
+    endpoint_url = os.environ['S3_ENDPOINT'],
     config = boto3.session.Config(signature_version = 's3v4'),
-    aws_access_key_id = os.environ['SCW_ACCESS_KEY_ID'],
-    aws_secret_access_key = os.environ['SCW_SECRET_ACCESS_KEY'],
+    aws_access_key_id = os.environ['S3_ID'],
+    aws_secret_access_key = os.environ['S3_SECRET'],
     aws_session_token = None)
   return s3
 
@@ -44,7 +44,7 @@ def process_file(file_id):
   #insertion de lecture et traitement du dataset
   s3 = connect_to_s3()
   Key= "sensors/" + str(information["sensor_id"]) + "/" + file_id + ".csv"
-  response = s3.get_object(Bucket=os.environ['SCW_S3_BUCKET'], Key = Key)
+  response = s3.get_object(Bucket=os.environ['S3_BUCKET'], Key = Key)
   content = response['Body'].read().decode('utf-8')
   data = pd.read_csv(io.StringIO(content), delimiter=";")
   dataset = run(data)

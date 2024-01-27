@@ -14,17 +14,7 @@ import io
 
 DEFAULT_PORT = "8080"
 
-
 app = Flask(__name__)
-
-def connect_to_s3():
-  s3 = boto3.client('s3',
-                     endpoint_url = os.environ['SCW_ENDPOINT'],
-                     config = boto3.session.Config(signature_version = 's3v4'),
-                     aws_access_key_id = os.environ['SCW_ACCESS_KEY_ID'],
-                     aws_secret_access_key = os.environ['SCW_SECRET_ACCESS_KEY'],
-                     aws_session_token = None)
-  return s3
 
 @app.errorhandler(404)
 def resource_not_found(e):

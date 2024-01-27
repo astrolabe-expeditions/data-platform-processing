@@ -5,12 +5,12 @@ from process import process_file
 
 # Create SQS client
 sqs = boto3.resource('sqs',
-  endpoint_url=os.environ['SCW_SQS_ENDPOINT'],
-  aws_access_key_id=os.environ['SCW_SQS_ID'],
-  aws_secret_access_key=os.environ['SCW_SQS_SECRET'],
-  region_name=os.environ['SCW_REGION'])
+  endpoint_url=os.environ['SQS_ENDPOINT'],
+  aws_access_key_id=os.environ['SQS_ID'],
+  aws_secret_access_key=os.environ['SQS_SECRET'],
+  region_name=os.environ['SQS_REGION'])
 
-queue = sqs.Queue(url=os.environ['SCW_SQS_QUEUE_URL'])
+queue = sqs.Queue(url=os.environ['SQS_QUEUE_URL'])
 
 messages = queue.receive_messages(
     MaxNumberOfMessages=1,
