@@ -11,8 +11,8 @@ provider:
   scwRegion: fr-par
 
   # Scaleway organization ID
-  scwProject: ${env:SCW_PROJECT_ID}
-  scwToken: ${env:SCW_TOKEN}
+  scwProject: ${env:SCW_ACCESS_KEY_ID}
+  scwToken: ${env:SCW_SECRET_ACCESS_KEY}
 
 plugins:
   - serverless-scaleway-functions
@@ -33,17 +33,3 @@ custom:
       memoryLimit: 256
       port: 8080
       timeout: 100s
-      env:
-        - name: MONGO_URI
-          value: ${env:MONGO_URI}
-        - name: MONGO_DATABASE
-          value: ${env:MONGO_DATABASE}
-        - name: SCW_BUCKET
-          value: ${env:SCW_BUCKET}
-        - name: SCW_ACCESS_KEY_ID
-          value: ${env:SCW_ACCESS_KEY_ID}
-        - name: SCW_SECRET_ACCESS_KEY
-          value: ${env:SCW_SECRET_ACCESS_KEY}
-        - name: SCW_ENDPOINT
-          value: ${env:SCW_ENDPOINT}
-
