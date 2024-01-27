@@ -30,3 +30,7 @@ jobs:
       with:
         args: -c "serverless plugin install --name serverless-scaleway-functions && serverless deploy"
         entrypoint: /bin/sh
+      env:
+        SCW_ACCESS_KEY_ID: ${{ secrets.SCW_ACCESS_KEY_ID }}
+        SCW_SECRET_ACCESS_KEY: ${{ secrets.SCW_SECRET_ACCESS_KEY }}
+        SCW_REGISTRY: ${{ secrets.SCW_REGISTRY }}
