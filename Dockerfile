@@ -5,4 +5,4 @@ COPY requirements.txt .
 RUN pip install -qr requirements.txt
 COPY ./src .
 
-CMD ["python3", "./server.py"]
+CMD ["python3", "./sqs.py"]
