@@ -14,7 +14,7 @@ jobs:
       uses: docker/login-action@v3
       with:
         username: nologin
-        password: ${{ secrets.SCW_TOKEN }}
+        password: ${{ secrets.SCW_SECRET_ACCESS_KEY }}
         registry: ${{ secrets.SCW_REGISTRY }}
     - name: Build the Docker image
       run: docker build . -t ${{ secrets.SCW_REGISTRY }}/ae-data-processing:latest
@@ -30,14 +30,3 @@ jobs:
       with:
         args: -c "serverless plugin install --name serverless-scaleway-functions && serverless deploy"
         entrypoint: /bin/sh
-      env:
-        SCW_PROJECT_ID: ${{ secrets.SCW_PROJECT_ID }}
-        SCW_TOKEN: ${{ secrets.SCW_TOKEN }}
-        SCW_REGISTRY: ${{ secrets.SCW_REGISTRY }}
-        MONGO_URI: ${{ secrets.MONGO_URI }}
-        MONGO_DATABASE: ${{ vars.MONGO_DATABASE }}
-        SCW_BUCKET: ${{ vars.SCW_BUCKET }}
-        SCW_ACCESS_KEY_ID: ${{ secrets.SCW_ACCESS_KEY_ID }}
-        SCW_SECRET_ACCESS_KEY: ${{ secrets.SCW_SECRET_ACCESS_KEY }}
-        SCW_ENDPOINT: ${{ vars.SCW_ENDPOINT }}
-        SCW_REGION: ${{ vars.SCW_REGION }}
