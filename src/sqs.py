@@ -22,5 +22,6 @@ print(f"Number of messages received: {len(messages)}")
 
 for message in messages:
     content = json.loads(message.body)
+    print(f"Processing file n°{content['file_id']}")
     result = process_file(content['file_id'])
     message.delete()
