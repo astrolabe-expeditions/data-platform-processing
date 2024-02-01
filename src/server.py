@@ -1,4 +1,4 @@
-from flask import Flask, abort, jsonify
+from flask import Flask, abort, jsonify, make_response, request
 import os
 import datetime
 
@@ -28,12 +28,6 @@ def root():
     print(request.get_data(), flush=True)
     response = make_response("Hello from container")
     return response
-
-
-@app.route("/process/<file_id>", methods=["POST"])
-def root(file_id):
-  result = process_file(content['file_id'])
-  return result
 
 
 if __name__ == "__main__":
