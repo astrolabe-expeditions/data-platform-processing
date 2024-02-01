@@ -21,6 +21,15 @@ def resource_not_found(e):
     return jsonify(error=str(e)), 404
 
 
+HTTP_METHODS = ["GET", "POST"]
+
+@app.route("/", methods=HTTP_METHODS)
+def root():
+    print(request.get_data(), flush=True)
+    response = make_response("Hello from container")
+    return response
+
+
 @app.route("/process/<file_id>", methods=["POST"])
 def root(file_id):
   result = process_file(content['file_id'])

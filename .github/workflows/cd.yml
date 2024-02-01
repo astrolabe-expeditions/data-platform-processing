@@ -14,7 +14,7 @@ jobs:
       uses: docker/login-action@v3
       with:
         username: nologin
-        password: ${{ secrets.SCW_SECRET_ACCESS_KEY }}
+        password: ${{ secrets.SCW_TOKEN }}
         registry: ${{ secrets.SCW_REGISTRY }}
     - name: Build the Docker image
       run: docker build . -t ${{ secrets.SCW_REGISTRY }}/ae-data-processing:latest
@@ -31,6 +31,12 @@ jobs:
         args: -c "serverless plugin install --name serverless-scaleway-functions && serverless deploy"
         entrypoint: /bin/sh
       env:
-        SCW_ACCESS_KEY_ID: ${{ secrets.SCW_ACCESS_KEY_ID }}
-        SCW_SECRET_ACCESS_KEY: ${{ secrets.SCW_SECRET_ACCESS_KEY }}
+        SCW_PROJECT: ${{ secrets.SCW_PROJECT }}
+        SCW_TOKEN: ${{ secrets.SCW_TOKEN }}
         SCW_REGISTRY: ${{ secrets.SCW_REGISTRY }}
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+        S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+        S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        S3_ID: ${{ secrets.S3_ID }}
+        S3_SECRET: ${{ secrets.S3_SECRET }}

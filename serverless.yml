@@ -11,8 +11,8 @@ provider:
   scwRegion: fr-par
 
   # Scaleway organization ID
-  scwProject: ${env:SCW_ACCESS_KEY_ID}
-  scwToken: ${env:SCW_SECRET_ACCESS_KEY}
+  scwProject: ${env:SCW_PROJECT}
+  scwToken: ${env:SCW_TOKEN}
 
 plugins:
   - serverless-scaleway-functions
@@ -31,5 +31,14 @@ custom:
       minScale: 0
       maxScale: 1
       memoryLimit: 256
+      cpuLimit: 140
       port: 8080
-      timeout: 100s
+      timeout: 10s
+      secret:
+        DATABASE_URL: ${env:DATABASE_URL}
+        DATABASE_NAME: ${env:DATABASE_NAME}
+        S3_ENDPOINT: ${env:S3_ENDPOINT}
+        S3_BUCKET: ${env:S3_BUCKET}
+        S3_ID: ${env:S3_ID}
+        S3_SECRET: ${env:S3_SECRET}
+
