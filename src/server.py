@@ -12,6 +12,8 @@ from main import run
 import pymongo
 import io
 
+from process import process_file
+
 DEFAULT_PORT = "8080"
 
 app = Flask(__name__)
@@ -26,8 +28,10 @@ HTTP_METHODS = ["GET", "POST"]
 @app.route("/", methods=HTTP_METHODS)
 def root():
     print(request.get_data(), flush=True)
-    response = make_response("Hello from container")
-    return response
+    data = json.loads(b'{"file_id":"65bbdcd4b4b804782a5a35e5"}')
+    print(f"Processing file n°{data['file_id']}")
+    result = process_file(data['file_id'])
+    return result
 
 
 if __name__ == "__main__":
