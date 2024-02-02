@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import boto3
 from dotenv import load_dotenv
-
+import json
 from tools import mongoDB_tools as DB_tools
 from main import run
 import pymongo
@@ -28,7 +28,7 @@ HTTP_METHODS = ["GET", "POST"]
 @app.route("/", methods=HTTP_METHODS)
 def root():
     print(request.get_data(), flush=True)
-    data = json.loads(b'{"file_id":"65bbdcd4b4b804782a5a35e5"}')
+    data = json.loads(request.get_data())
     print(f"Processing file n°{data['file_id']}")
     result = process_file(data['file_id'])
     return result
