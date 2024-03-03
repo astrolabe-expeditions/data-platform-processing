@@ -7,6 +7,40 @@ laboratories to enable citizens to actively contribute to scientific research.
 
 Citizens' expeditions are set up to collect large-scale scientific data and involve citizens in understanding and preserving the ocean.
 
+## Local development
+
+Clone the repository
+```sh
+git clone git@github.com:astrolabe-expeditions/data-platform-processing.git
+```
+
+Switch to the repo folder
+```sh
+cd data-platform-processing
+```
+
+Create new virtual env with Virtualenv
+```sh
+virtualenv venv
+```
+
+Activate your venv
+```sh
+source venv/bin/activate
+```
+
+Install dependencies
+```sh
+pip install -r requirements.txt
+```
+
+To test with the web server
+```sh
+python src/server.py
+```
+
+You can now access the server at [http://localhost:8080](http://localhost:8080)
+
 ## Local development with docker
 
 You'll need to have [Docker installed](https://docs.docker.com/get-docker/).
@@ -14,12 +48,12 @@ It's available on Windows, macOS and most distros of Linux.
 
 Clone the repository
 ```sh
-git clone git@github.com:astrolabe-expeditions/data-plateform-processing.git
+git clone git@github.com:astrolabe-expeditions/data-platform-processing.git
 ```
 
 Switch to the repo folder
 ```sh
-cd data-plateform-processing
+cd data-platform-processing
 ```
 
 Copy the example env file and make the required configuration changes in the .env file
