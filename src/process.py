@@ -1,15 +1,14 @@
 import os
-import datetime
+import requests
 
 import pandas as pd
-import numpy as np
 import boto3
 from dotenv import load_dotenv
 
-from tools import mongoDB_tools as DB_tools
 from main import run
-import pymongo
 import io
+from flask import abort
+import json
 
 def connect_to_s3():
   s3 = boto3.client('s3',
@@ -20,53 +19,87 @@ def connect_to_s3():
     aws_session_token = None)
   return s3
 
+class PandasEncoder(json.JSONEncoder):
+    def default(self, obj):
+      if(isinstance(obj, pd._libs.tslibs.timestamps.Timestamp)):
+        return str(obj.to_pydatetime())
+
+      return super(PandasEncoder, self).default(obj)
+
 def process_file(file_id):
   load_dotenv() # load environment variables from .env file
 
-  myclient = pymongo.MongoClient(os.environ['DATABASE_URL'])
-  db = myclient[os.environ['DATABASE_NAME']]
+  # Retrieve the file JSON via the API route
+  file_url = f"http://localhost:3000/api/v1/files/{file_id}"
+  response = requests.get(file_url)
+  if response.status_code == 200:
+    file = response.json()['data']
+  else:
+    file = None
 
-  #connexion à la collection files de mongoDB
-  files = db.files
-
-  #transformation du file_id de string a ObjectId
-  file_id_object = DB_tools.object_file(file_id)
-
-  #extraire la ligne de files qui correspondant au file_id
-  information = DB_tools.find_file(files, file_id_object)
-
-  if information is None:
+  if file is None:
     abort(404, description="Resource not found")
 
-  #mise à jour du status du fichier à en cours
-  resultat = DB_tools.update_status(files,file_id_object,"in_process")
+  # Mise à jour du status du fichier à en cours
+  print(f"File {file_id} - {file['name']} being processed")
+  file["status"] = "in_process"  # Update the status to "in_process"
+  update_response = requests.put(file_url, json=file)
+  if update_response.status_code != 200:
+    # Handle the error if the update fails
+    abort(update_response.status_code, description="Failed to update file status")
 
-  #insertion de lecture et traitement du dataset
+  # Insertion de lecture et traitement du dataset
   s3 = connect_to_s3()
-  Key= "sensors/" + str(information["sensor_id"]) + "/" + file_id + ".csv"
+  Key= "sensors/" + str(file["sensor_id"]) + "/" + file_id + ".csv"
   response = s3.get_object(Bucket=os.environ['S3_BUCKET'], Key = Key)
   content = response['Body'].read().decode('utf-8')
   data = pd.read_csv(io.StringIO(content), delimiter=";")
   dataset = run(data)
+  print(f"File {file_id} - cleaned and transformed")
 
-  #insertion des colonnes manquantes dans le dataset
-  dataset["sensor_id"] = str(information["sensor_id"])
-  dataset["file_id"] = str(file_id)
-  dataset["created_at"] = datetime.datetime.now()
-  dataset["updated_at"] = datetime.datetime.now()
+  # Insertion des colonnes manquantes dans le dataset
+  dataset["sensor_id"] = str(file["sensor_id"])
 
   data_dict = dataset.to_dict("records")
+  print(f"File {file_id} - inserting {len(data_dict)} records")
+  if data_dict:
 
-  #connexion à la collection records de mongoDB
-  records=db.records
+    # Envoyer par batch de 100
+    batch_size = 100
+    num_batches = len(data_dict) // batch_size + 1
 
-  #Insertion des données dans la BDD mongoDB
-  records.insert_many(data_dict)
+    for i in range(num_batches):
+      start = i * batch_size
+      end = (i + 1) * batch_size
+      print(f"File {file_id} - inserting batch {i + 1}/{num_batches}")
+      batch_data = []
+      for data in data_dict[start:end]:
+        transformed_data = {
+          "sensor_id": data["sensor_id"],
+          "recorded_at": data["recorded_at"],
+          "latitude": data["latitude"],
+          "longitude": data["longitude"],
+          "properties": {
+            key: value for key, value in data.items() if key not in ["sensor_id", "recorded_at", "latitude", "longitude"]
+          }
+        }
+        batch_data.append(transformed_data)
+      batch_data_json = json.dumps(batch_data, cls=PandasEncoder)
 
-  #mise à jour du status du fichier à terminé
-  fin = DB_tools.update_status(files,file_id_object,"processed")
+      response = requests.post(f"http://localhost:3000/api/v1/sensors/{file['sensor_id']}/records/create_or_update_many", json={
+        "data": batch_data_json
+      })
 
-  #fermeture du lien avec la BDD
-  myclient.close()
+      if response.status_code != 201:
+        # Handle the error if the request fails
+        abort(response.status_code, description="Failed to insert data")
+
+  # mise à jour du status du fichier à terminé
+  print(f"File {file_id} - processed successfully")
+  file["status"] = "processed"  # Update the status to "processed"
+  update_response = requests.put(file_url, json=file)
+  if update_response.status_code != 200:
+    # Handle the error if the update fails
+    abort(update_response.status_code, description="Failed to update file status")
 
   return {"message": "success"}, 201

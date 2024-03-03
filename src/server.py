@@ -2,15 +2,8 @@ from flask import Flask, abort, jsonify, make_response, request
 import os
 import datetime
 
-import pandas as pd
-import numpy as np
-import boto3
-from dotenv import load_dotenv
 import json
-from tools import mongoDB_tools as DB_tools
 from main import run
-import pymongo
-import io
 
 from process import process_file
 
