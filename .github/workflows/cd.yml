@@ -34,9 +34,8 @@ jobs:
         SCW_PROJECT: ${{ secrets.SCW_PROJECT }}
         SCW_TOKEN: ${{ secrets.SCW_TOKEN }}
         SCW_REGISTRY: ${{ secrets.SCW_REGISTRY }}
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
         S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
         S3_BUCKET: ${{ secrets.S3_BUCKET }}
         S3_ID: ${{ secrets.S3_ID }}
         S3_SECRET: ${{ secrets.S3_SECRET }}
+        API_URL: ${{ secrets.API_URL }}
