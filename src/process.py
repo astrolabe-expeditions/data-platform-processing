@@ -30,7 +30,7 @@ def process_file(file_id):
   load_dotenv() # load environment variables from .env file
 
   # Retrieve the file JSON via the API route
-  file_url = f"http://localhost:3000/api/v1/files/{file_id}"
+  file_url = os.environ['API_URL'] + f"/files/{file_id}"
   response = requests.get(file_url)
   if response.status_code == 200:
     file = response.json()['data']
@@ -86,7 +86,7 @@ def process_file(file_id):
         batch_data.append(transformed_data)
       batch_data_json = json.dumps(batch_data, cls=PandasEncoder)
 
-      response = requests.post(f"http://localhost:3000/api/v1/sensors/{file['sensor_id']}/records/create_or_update_many", json={
+      response = requests.post( os.environ['API_URL'] + f"/sensors/{file['sensor_id']}/records/create_or_update_many", json={
         "data": batch_data_json
       })
 

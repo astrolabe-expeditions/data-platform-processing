@@ -20,9 +20,7 @@ HTTP_METHODS = ["GET", "POST"]
 
 @app.route("/", methods=HTTP_METHODS)
 def root():
-    print(request.get_data(), flush=True)
     data = json.loads(request.get_data())
-    print(f"Processing file n°{data['file_id']}")
     result = process_file(data['file_id'])
     return result
 
