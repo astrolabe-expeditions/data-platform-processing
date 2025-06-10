@@ -1,5 +1,11 @@
 # Data platform processing
 
+This platform centralizes and manages data collected from citizen expeditions organized by Astrolabe Expeditions. This repository contains the ETL (Extract, Transform, Load) pipeline components. Other parts of the project include a [back-office and API](https://github.com/astrolabe-expeditions/data-platform-frontend) and a [map application](https://github.com/astrolabe-expeditions/data-platform-map) for visualizing collected data.
+
+> [!WARNING]
+> This project is archived and no longer maintained.
+> Feel free to browse the code, but note that no further updates or support will be provided.
+
 ## What is Astrolabe Expeditions?
 
 [Astrolabe Expeditions](https://www.astrolabe-expeditions.org/) is an non-profit association that develops participatory science programmes with
